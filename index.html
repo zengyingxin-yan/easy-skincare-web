@@ -39,7 +39,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
                 <h1 class="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 cyber-brand">GlowFlow</h1>
-                <span class="text-[10px] bg-purple-950/60 text-purple-300 px-2 py-0.5 rounded border border-purple-800/30">v3.0 Hybrid</span>
+                <span class="text-[10px] bg-purple-950/60 text-purple-300 px-2 py-0.5 rounded border border-purple-800/30">v3.1 Hybrid</span>
             </div>
             <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-800/80">
                 <button id="tab-btn-routine" onclick="switchMainTab('routine')" class="px-4 py-1.5 rounded-lg font-medium text-xs transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
@@ -73,10 +73,10 @@
         <div id="main-panel-routine" class="space-y-4">
             
             <!-- Weekday Switcher Dashboard -->
-            <div class="bg-slate-950/40 border border-slate-900 rounded-2xl p-4">
-                <div class="flex justify-between items-center mb-4">
+            <div class="bg-slate-950/40 border border-slate-900 rounded-2xl p-4 space-y-4">
+                <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-bold text-slate-300">📅 ROUTINE 打卡管理</span>
+                        <span class="text-sm font-bold text-slate-300">📅 ROUTINE 打卡与日程管理</span>
                     </div>
                     <span class="text-xs font-mono text-cyan-400">2026-05-24</span>
                 </div>
@@ -91,16 +91,35 @@
                     <button onclick="switchRoutineDay(6)" id="day-tab-6" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">六</button>
                     <button onclick="switchRoutineDay(0)" id="day-tab-0" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">日</button>
                 </div>
+
+                <!-- NEW: Bulk Text Importer (周计划批量修改) Brought Back! -->
+                <div class="bg-slate-900/30 border border-slate-800/80 rounded-xl p-3.5 mt-2 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-medium text-purple-400">⚡ 全周计划一键批量调整/文本备份输入框</h4>
+                        <button onclick="toggleBulkCollapse()" class="text-[11px] text-slate-500 hover:text-slate-300">展开/收起</button>
+                    </div>
+                    <div id="bulk-importer-area">
+                        <p class="text-[10px] text-slate-400 mb-1.5">你可以直接把整周的流程文本粘贴到下面（支持类似“周一 早上：xx 晚上：xx”的文本），点击紫色按钮可自动一键覆盖全周规划：</p>
+                        <textarea id="raw-bulk-text" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-purple-500" placeholder="周一：&#10;早：修丽可洁面，CE精华，防晒&#10;晚：温和洗脸，水杨酸棉片，珂润面霜&#10;&#10;周二：&#10;..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button onclick="parseTextToInputs()" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all">
+                                ⚡ 智能识别并覆盖全周计划
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Routine Cards Display Area -->
             <div class="space-y-4">
                 <!-- Morning Container -->
                 <div class="bg-slate-950/50 border border-slate-900 rounded-2xl p-5 space-y-3">
-                    <div class="flex items-center gap-2 border-b border-slate-900 pb-2">
-                        <span class="text-amber-400 text-sm">☀️</span>
-                        <h3 class="text-sm font-bold text-cyan-400">Morning 早间流程</h3>
-                        <span class="text-[10px] bg-cyan-950/50 text-cyan-400 px-2 py-0.5 rounded border border-cyan-900/40">周循环常规</span>
+                    <div class="flex justify-between items-center border-b border-slate-900 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-amber-400 text-sm">☀️</span>
+                            <h3 class="text-sm font-bold text-cyan-400">Morning 早间流程</h3>
+                        </div>
+                        <button onclick="addNewTaskInline('morning')" class="text-[11px] bg-slate-900 border border-slate-800 text-cyan-400 px-2 py-0.5 rounded hover:bg-slate-850">+ 增加单项</button>
                     </div>
                     <div id="morning-list" class="space-y-2">
                         <!-- Dynamic items -->
@@ -109,10 +128,12 @@
 
                 <!-- Night Container -->
                 <div class="bg-slate-950/50 border border-slate-900 rounded-2xl p-5 space-y-3">
-                    <div class="flex items-center gap-2 border-b border-slate-900 pb-2">
-                        <span class="text-indigo-400 text-sm">🌙</span>
-                        <h3 class="text-sm font-bold text-pink-500">Night 晚间流程</h3>
-                        <span class="text-[10px] bg-pink-950/50 text-pink-400 px-2 py-0.5 rounded border border-pink-900/40">周循环常规</span>
+                    <div class="flex justify-between items-center border-b border-slate-900 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-indigo-400 text-sm">🌙</span>
+                            <h3 class="text-sm font-bold text-pink-500">Night 晚间流程</h3>
+                        </div>
+                        <button onclick="addNewTaskInline('night')" class="text-[11px] bg-slate-900 border border-slate-800 text-pink-400 px-2 py-0.5 rounded hover:bg-slate-850">+ 增加单项</button>
                     </div>
                     <div id="night-list" class="space-y-2">
                         <!-- Dynamic items -->
@@ -200,7 +221,7 @@
 
     <script>
         // --- DATA STORE ---
-        // Decoupled Static Initial Routines (Snapshots, no reference linked to asset ids)
+        // Dynamically modifiable routines list
         let initialRoutines = {
             1: {
                 morning: ["修丽可 氨基酸洁面奶", "修丽可 CE精粹VC精华", "理肤泉 B5万能修护霜", "安热沙 金瓶防晒乳"],
@@ -232,7 +253,7 @@
             }
         };
 
-        // Initialize user routine item check states
+        // Checklist states tracking mapped dynamically
         let routineCheckedStates = {}; 
 
         // Static Initial Inventory
@@ -244,21 +265,19 @@
             { id: "p5", name: "露得清 0.5%A醇晚霜", type: "面霜/乳液", efficacy: "抗衰老、抗皱、加速角质代谢", ingredients: "视黄醇 (A醇)", expiryDate: "2026-12-30" }
         ];
 
-        let currentSelectedDay = 0; // Default to Sunday for presentation match
+        let currentSelectedDay = 1; // Default to Mon
 
         // --- CORE LIFE CYCLE ---
         window.onload = function() {
-            // Load key from storage if exists
             const savedKey = localStorage.getItem('glowflow_api_key');
             if (savedKey) {
                 document.getElementById('api-key-input').value = savedKey;
             }
             
-            // Sync default date
             const todayNum = new Date().getDay();
             currentSelectedDay = todayNum;
             
-            // Pre-populate unique checklist ids
+            // Build baseline checklist states
             for (let day in initialRoutines) {
                 routineCheckedStates[day] = {
                     morning: initialRoutines[day].morning.map(() => false),
@@ -269,6 +288,12 @@
             switchRoutineDay(currentSelectedDay);
             renderInventoryGrid();
         };
+
+        // Collapse helper
+        function toggleBulkCollapse() {
+            const area = document.getElementById('bulk-importer-area');
+            area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        }
 
         // --- TAB SWITCH ENGINE ---
         function switchMainTab(target) {
@@ -292,17 +317,16 @@
 
         function switchRoutineDay(dayNum) {
             currentSelectedDay = dayNum;
-            // Highlight Day Button
             for(let i=0; i<=6; i++) {
-                document.getElementById(`day-tab-${i}`).className = "py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center";
+                document.getElementById(`day-tab-${i}`).className = "py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center cursor-pointer";
             }
-            document.getElementById(`day-tab-${dayNum}`).className = "py-2.5 rounded-xl text-center font-bold text-sm neon-btn-active transition-all";
+            document.getElementById(`day-tab-${dayNum}`).className = "py-2.5 rounded-xl text-center font-bold text-sm neon-btn-active transition-all cursor-pointer";
 
-            // Render Lists
             renderRoutineSession('morning', 'morning-list');
             renderRoutineSession('night', 'night-list');
         }
 
+        // Render routine lines with built-in instant inputs to support free single editing!
         function renderRoutineSession(sessionType, targetContainerId) {
             const container = document.getElementById(targetContainerId);
             container.innerHTML = '';
@@ -311,39 +335,110 @@
             const checks = routineCheckedStates[currentSelectedDay][sessionType];
 
             if(items.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-600 italic py-2">今天这档没有排班，皮肤放轻松~</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-600 italic py-2 px-1">这一档暂无安排，支持自行点击上方增加单项哦~</p>`;
                 return;
             }
 
             items.forEach((itemName, index) => {
                 const isChecked = checks[index];
                 
-                // Extract classification badge hints if found in item text
-                let badgeHtml = '';
-                if(itemName.includes('洁面') || itemName.includes('洗脸')) badgeHtml = `<span class="text-[9px] bg-cyan-950 text-cyan-400 px-1 rounded border border-cyan-800/40">洁面</span>`;
-                else if(itemName.includes('精粹') || itemName.includes('精华') || itemName.includes('抗双')) badgeHtml = `<span class="text-[9px] bg-purple-950 text-purple-400 px-1 rounded border border-purple-800/40">精华</span>`;
-                else if(itemName.includes('霜')) badgeHtml = `<span class="text-[9px] bg-pink-950 text-pink-400 px-1 rounded border border-pink-800/40">面霜</span>`;
-                else if(itemName.includes('防晒') || itemName.includes('乳')) badgeHtml = `<span class="text-[9px] bg-amber-950 text-amber-400 px-1 rounded border border-amber-800/40">防护</span>`;
-                else badgeHtml = `<span class="text-[9px] bg-slate-800 text-slate-400 px-1 rounded">维护</span>`;
-
                 const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-3 rounded-xl border border-slate-900/60 transition-all ${isChecked ? 'bg-slate-950/20 opacity-40' : 'bg-slate-900/30 hover:bg-slate-900/50'}`;
+                div.className = `flex items-center justify-between p-2 rounded-xl border border-slate-900/80 transition-all ${isChecked ? 'bg-slate-950/20 opacity-40' : 'bg-slate-900/40 hover:border-slate-800'}`;
                 
                 div.innerHTML = `
-                    <div class="flex items-center gap-3 flex-1 cursor-pointer" onclick="toggleTaskCheck(${index}, '${sessionType}')">
-                        <div class="w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isChecked ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 bg-slate-950'}" id="chk-box-${sessionType}-${index}">
+                    <div class="flex items-center gap-3 flex-1">
+                        <!-- Checkbox Box Toggle -->
+                        <div onclick="toggleTaskCheck(${index}, '${sessionType}')" class="w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-all shrink-0 ${isChecked ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 bg-slate-950'}" id="chk-box-${sessionType}-${index}">
                             ${isChecked ? '✓' : ''}
                         </div>
-                        <div class="flex flex-col">
-                            <span class="text-xs font-medium text-slate-200 ${isChecked ? 'line-through text-slate-500' : ''}">${itemName}</span>
-                        </div>
+                        <!-- Individual free text edit input! -->
+                        <input type="text" 
+                               value="${itemName}" 
+                               oninput="updateSingleTaskText(${index}, '${sessionType}', this.value)"
+                               class="bg-transparent text-xs font-medium text-slate-200 border-b border-transparent hover:border-slate-800 focus:border-cyan-500 focus:outline-none py-0.5 w-full ${isChecked ? 'line-through text-slate-500' : ''}" 
+                               placeholder="键入自定义护肤单项...">
                     </div>
-                    <div class="flex items-center gap-2">
-                        ${badgeHtml}
-                    </div>
+                    <!-- Delete item line -->
+                    <button onclick="deleteSingleTaskLine(${index}, '${sessionType}')" class="text-slate-600 hover:text-rose-400 text-sm px-2 font-bold ml-1">×</button>
                 `;
                 container.appendChild(div);
             });
+        }
+
+        // Handlers for individual free task editing
+        function updateSingleTaskText(index, sessionType, newValue) {
+            initialRoutines[currentSelectedDay][sessionType][index] = newValue;
+        }
+
+        function deleteSingleTaskLine(index, sessionType) {
+            initialRoutines[currentSelectedDay][sessionType].splice(index, 1);
+            routineCheckedStates[currentSelectedDay][sessionType].splice(index, 1);
+            renderRoutineSession(sessionType, sessionType === 'morning' ? 'morning-list' : 'night-list');
+        }
+
+        function addNewTaskInline(sessionType) {
+            initialRoutines[currentSelectedDay][sessionType].push("");
+            routineCheckedStates[currentSelectedDay][sessionType].push(false);
+            renderRoutineSession(sessionType, sessionType === 'morning' ? 'morning-list' : 'night-list');
+        }
+
+        // --- BULK TEXT PARSER ENGINE ---
+        function parseTextToInputs() {
+            const txt = document.getElementById('raw-bulk-text').value.trim();
+            if(!txt) {
+                alert("请输入批量文本后再进行同步！");
+                return;
+            }
+
+            const lines = txt.split('\n');
+            let currentDay = null;
+
+            // Temporary structural storage to wipe and rewrite cleanly
+            let parseBuffer = { 1:{m:[], n:[]}, 2:{m:[], n:[]}, 3:{m:[], n:[]}, 4:{m:[], n:[]}, 5:{m:[], n:[]}, 6:{m:[], n:[]}, 0:{m:[], n:[]} };
+
+            for(let i=0; i<lines.length; i++) {
+                let line = lines[i].trim();
+                if(!line) continue;
+
+                if (line.includes("周一") || line.includes("星期一")) currentDay = 1;
+                else if (line.includes("周二") || line.includes("星期二")) currentDay = 2;
+                else if (line.includes("周三") || line.includes("星期三")) currentDay = 3;
+                else if (line.includes("周四") || line.includes("星期四")) currentDay = 4;
+                else if (line.includes("周五") || line.includes("星期五")) currentDay = 5;
+                else if (line.includes("周六") || line.includes("星期六")) currentDay = 6;
+                else if (line.includes("周日") || line.includes("星期日") || line.includes("周天")) currentDay = 0;
+
+                if(currentDay !== null) {
+                    if(line.startsWith("早：") || line.startsWith("早") || line.includes("早晨") || line.includes("早上")) {
+                        let content = line.replace(/^(早|早上|早晨)[：:]?/, '').trim();
+                        if(content) {
+                            // Split items by either comma or space ideograms
+                            let pieces = content.split(/[,，、\s]+/).filter(Boolean);
+                            parseBuffer[currentDay].m = parseBuffer[currentDay].m.concat(pieces);
+                        }
+                    }
+                    if(line.startsWith("晚：") || line.startsWith("晚") || line.includes("晚间") || line.includes("晚上")) {
+                        let content = line.replace(/^(晚|晚上|晚间)[：:]?/, '').trim();
+                        if(content) {
+                            let pieces = content.split(/[,，、\s]+/).filter(Boolean);
+                            parseBuffer[currentDay].n = parseBuffer[currentDay].n.concat(pieces);
+                        }
+                    }
+                }
+            }
+
+            // Flush buffer down to state arrays safely
+            for(let d in parseBuffer) {
+                if(parseBuffer[d].m.length > 0 || parseBuffer[d].n.length > 0) {
+                    initialRoutines[d].morning = parseBuffer[d].m;
+                    initialRoutines[d].night = parseBuffer[d].n;
+                    routineCheckedStates[d].morning = parseBuffer[d].m.map(() => false);
+                    routineCheckedStates[d].night = parseBuffer[d].n.map(() => false);
+                }
+            }
+
+            switchRoutineDay(currentSelectedDay);
+            alert("⚡ 全周计划文本已成功智能解析并重置！请点击一至日各选项查看。");
         }
 
         function toggleTaskCheck(index, sessionType) {
@@ -351,7 +446,7 @@
             renderRoutineSession(sessionType, sessionType === 'morning' ? 'morning-list' : 'night-list');
         }
 
-        // --- INVENTORY MANAGER (FULLY DECOUPLED FROM ROUTINES) ---
+        // --- INVENTORY MANAGER ---
         function renderInventoryGrid() {
             const categories = {
                 '洁面': 'grid-cleanser',
@@ -361,7 +456,6 @@
                 '其他': 'grid-other'
             };
 
-            // Clear grids
             for(let key in categories) {
                 document.getElementById(categories[key]).innerHTML = '';
                 document.getElementById(`cat-block-${getCategorySlug(key)}`).style.display = 'none';
@@ -373,10 +467,8 @@
                 const gridId = categories[prod.type] || 'grid-other';
                 const gridContainer = document.getElementById(gridId);
                 
-                // Show parent block since it has items
                 document.getElementById(`cat-block-${getCategorySlug(prod.type)}`).style.display = 'block';
 
-                // Calculate remaining days
                 const expiry = new Date(prod.expiryDate);
                 const diffTime = expiry - today;
                 const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -475,7 +567,6 @@
                 const data = await response.json();
                 const cleanJson = JSON.parse(data.choices[0].message.content);
 
-                // Insert into products library
                 const newProduct = {
                     id: "p_" + Date.now(),
                     name: nameInput,
@@ -488,7 +579,6 @@
                 inventoryProducts.unshift(newProduct);
                 renderInventoryGrid();
 
-                // Clear input
                 document.getElementById('ai-prod-name').value = '';
                 document.getElementById('ai-prod-expiry').value = '';
                 alert(`🧪 AI 智能上架成功！已自动为您归类至 [${cleanJson.type}]`);
