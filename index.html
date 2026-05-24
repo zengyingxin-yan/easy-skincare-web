@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlowFlow // 智能护肤管理系统</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- 引入前端0成本生成Excel的标准库 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d0b18;
+            --card-bg: #161426;
+            --text-main: #f3f3f6;
+            --text-muted: #85829a;
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-purple: #9d00ff;
+            --border: #262343;
+            --danger: #ff3b30;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 60px;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 {
+            font-size: 28px; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;
+        }
+
+        .section-title {
+            font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+            margin: 25px 0 10px 5px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+            padding: 16px; margin-bottom: 15px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* 星期切换 */
+        .week-bar { display: flex; justify-content: space-between; background: var(--card-bg); padding: 6px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .day-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; flex: 1; transition: all 0.2s; }
+        .day-btn.active { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); color: #fff; box-shadow: 0 0 10px rgba(255, 0, 127, 0.4); }
+
+        /* 打卡列表 */
+        .task-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .task-item:last-child { border-bottom: none; }
+        .checkbox-wrapper { position: relative; width: 22px; height: 22px; margin-right: 15px; }
+        .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; width: 100%; height: 100%; z-index: 2; }
+        .checkmark { position: absolute; top: 0; left: 0; width: 22px; height: 22px; background: transparent; border: 2px solid var(--border); border-radius: 6px; transition: all 0.2s; }
+        .checkbox-wrapper input:checked ~ .checkmark { background: var(--neon-blue); border-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+        .task-info { flex: 1; }
+        .task-name { font-size: 15px; font-weight: 500; }
+        .task-effect { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .checkbox-wrapper input:checked ~ .task-info .task-name { text-decoration: line-through; color: var(--text-muted); }
+
+        /* 标签流 */
+        .type-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: normal; vertical-align: middle; }
+        .tag-temp { background: rgba(255, 0, 127, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+        .tag-law { background: rgba(0, 240, 255, 0.2); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+
+        /* 护肤品资产分类排版 */
+        .category-block { margin-bottom: 15px; }
+        .category-title { font-size: 13px; font-weight: bold; color: var(--neon-blue); margin-bottom: 8px; border-left: 2px solid var(--neon-blue); padding-left: 6px; }
+        .prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .prod-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px; border-radius: 12px; position: relative; }
+        .prod-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #fff; padding-right: 24px; }
+        .prod-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .expiry-alert { color: var(--neon-pink); font-weight: bold; }
+        
+        /* 删除按钮样式 */
+        .delete-btn {
+            position: absolute; top: 10px; right: 10px; background: transparent; border: none;
+            color: var(--text-muted); cursor: pointer; font-size: 14px; transition: color 0.2s;
+        }
+        .delete-btn:hover { color: var(--danger); }
+
+        /* 输入与按钮 */
+        .ai-input-group { display: flex; gap: 8px; margin-top: 10px; }
+        textarea { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); padding: 10px; font-family: inherit; resize: none; height: 45px; font-size: 13px; }
+        textarea:focus { outline: none; border-color: var(--neon-blue); }
+        .btn { background: var(--neon-blue); color: #000; border: none; padding: 0 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-pink { background: transparent; border: 1px solid var(--neon-pink); color: var(--neon-pink); }
+        .btn-purple { background: var(--neon-purple); color: #fff; }
+        .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+
+        .ai-response-box { background: rgba(0, 240, 255, 0.04); border: 1px dashed var(--neon-blue); border-radius: 12px; padding: 15px; margin-top: 15px; display: none; }
+        .config-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+        .config-row input { background: #000; border: 1px solid var(--border); color: #fff; padding: 6px; border-radius: 6px; width: 180px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>GLOWFLOW</h1>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">INTELLIGENT SKINCARE LAB // 2026</div>
+    </header>
+
+    <!-- KEY配置 -->
+    <div class="card" style="padding: 12px 16px;">
+        <div class="config-row">
+            <span>大模型密钥 API Key (支持硅基流动/DeepSeek):</span>
+            <input type="password" id="apiKey" placeholder="输入 API Key" onchange="saveKey()">
+        </div>
+    </div>
+
+    <!-- 1. 计划输入区 -->
+    <div class="section-title">✨ 外部计划导入（Gemini 文本一键生成）</div>
+    <div class="card">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">把你从其他 AI 聊天里要到的一周护肤文本直接贴在下面，系统会自动识别并匹配库存商品：</div>
+        <textarea id="raw-plan-input" style="height: 60px;" placeholder="例如：周一：早清水洗脸+防晒，晚洗面奶+A醇..."></textarea>
+        <button class="btn btn-sm btn-purple" style="margin-top: 8px;" onclick="parseRawWeeklyPlan()">⚡ 智能解析并覆盖周计划</button>
+    </div>
+
+    <!-- 2. 日程打卡区域 -->
+    <div class="section-title">
+        <span>📅 ROUTINE 打卡管理</span>
+        <span id="current-date-str" style="font-size: 12px; color: var(--neon-blue);"></span>
+    </div>
+    
+    <div class="week-bar" id="weekBar">
+        <button class="day-btn" onclick="switchDay(1)">一</button>
+        <button class="day-btn" onclick="switchDay(2)">二</button>
+        <button class="day-btn" onclick="switchDay(3)">三</button>
+        <button class="day-btn" onclick="switchDay(4)">四</button>
+        <button class="day-btn" onclick="switchDay(5)">五</button>
+        <button class="day-btn" onclick="switchDay(6)">六</button>
+        <button class="day-btn" onclick="switchDay(0)">日</button>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size:14px; color: var(--neon-blue);">
+            ☀️ Morning 早间流程 <span id="tag-m" class="type-tag"></span>
+        </h3>
+        <div id="morning-tasks"></div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size:14px; color: var(--neon-pink);">
+            🌙 Night 晚间流程 <span id="tag-n" class="type-tag"></span>
+        </h3>
+        <div id="night-tasks"></div>
+    </div>
+
+    <!-- 3. AI皮肤顾问 -->
+    <div class="section-title"><span>✨ AI 突发皮肤顾问</span></div>
+    <div class="card">
+        <div class="ai-input-group">
+            <textarea id="ai-input" placeholder="输入当下皮肤状况（如：今天暴晒泛红脱皮 / 最近连续长闭口怎么办）..."></textarea>
+            <button class="btn" onclick="askAIConsultant()">咨询决策</button>
+        </div>
+        <div class="ai-response-box" id="aiResponseBox">
+            <h4 style="margin: 0 0 10px 0; color: var(--neon-blue); font-size: 13px;">💆‍♂️ AI 顾问建议与变动：</h4>
+            <div id="ai-text-advice" style="font-size: 12px; line-height: 1.6; margin-bottom: 15px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="applyAiAdjustment()">确认无误，应用更改</button>
+                <button class="btn btn-pink" onclick="document.getElementById('aiResponseBox').style.display='none'">拒绝</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 护肤品资产管理 -->
+    <div class="section-title">
+        <span>🧪 我的护肤资产库</span>
+        <div style="display: flex; gap: 5px;">
+            <button class="btn btn-sm btn-pink" onclick="exportToExcel()">📥 导出Excel</button>
+            <button class="btn btn-sm" onclick="triggerAddProduct()">+ 智能录入</button>
+        </div>
+    </div>
+    <div class="card" id="assets-card-container">
+        <!-- 动态按分类渲染护肤品 -->
+    </div>
+</div>
+
+<script>
+    // --- 初始数据配置 ---
+    const defaultProducts = {
+        "p1": { name: "修丽可 氨基酸洁面奶", category: "洁面", effect: "温和清洁，无负担", ingredients: "甘氨酸、椰油酰", expiryDate: "2027-05-01" },
+        "p2": { name: "修丽可 CE精粹VC精华", category: "精华", effect: "抗氧化、提亮、抗光老化", ingredients: "15%左旋C + 1%E", expiryDate: "2026-10-15" },
+        "p3": { name: "理肤泉 B5万能修护霜", category: "面霜", effect: "深层舒缓、强韧屏障、褪红", ingredients: "维生素B5、积雪草苷", expiryDate: "2027-02-01" },
+        "p4": { name: "安热沙 金瓶防晒乳", category: "防晒", effect: "强效高倍防晒", ingredients: "氧化锌、桂皮酸盐", expiryDate: "2026-09-20" },
+        "p5": { name: "露得清 0.5%A醇晚霜", category: "面霜", effect: "抗衰老、抗皱、加速角质代谢", ingredients: "视黄醇 (A醇)", expiryDate: "2026-12-30" },
+        "p6": { name: "兰蔻 极光保湿水", category: "保湿水", effect: "抛光角质、改善暗沉平衡", ingredients: "榉木微囊、水杨酸", expiryDate: "2026-11-20" }
+    };
+
+    const defaultWeeklyRoutine = {
+        1: { morning: ["p1", "p2", "p3", "p4"], night: ["p1", "p5", "p3"] }, 
+        2: { morning: ["p1", "p6", "p3", "p4"], night: ["p1", "p3"] },       
+        3: { morning: ["p1", "p2", "p3", "p4"], night: ["p1", "p5", "p3"] }, 
+        4: { morning: ["p1", "p6", "p3", "p4"], night: ["p1", "p3"] },       
+        5: { morning: ["p1", "p2", "p3", "p4"], night: ["p1", "p5", "p3"] }, 
+        6: { morning: ["p1", "p3", "p4"],       night: ["p1", "p3"] },       
+        0: { morning: ["p1", "p2", "p3", "p4"], night: ["p1", "p3"] }        
+    };
+
+    const categoriesList = ["洁面", "保湿水", "精华", "面霜", "防晒", "面膜/眼霜/特殊处理"];
+
+    let products = JSON.parse(localStorage.getItem('sc_prods_v2')) || defaultProducts;
+    let weeklyRoutine = JSON.parse(localStorage.getItem('sc_weekly_v2')) || defaultWeeklyRoutine;
+    let dailyOverrides = JSON.parse(localStorage.getItem('sc_overrides_v2')) || {}; 
+    let checkInLog = JSON.parse(localStorage.getItem('sc_log_v2')) || {}; 
+
+    let selectedDay = new Date().getDay(); 
+    let currentTodayDay = new Date().getDay();
+    let tempAiDecision = null; 
+
+    function saveData() {
+        localStorage.setItem('sc_prods_v2', JSON.stringify(products));
+        localStorage.setItem('sc_weekly_v2', JSON.stringify(weeklyRoutine));
+        localStorage.setItem('sc_overrides_v2', JSON.stringify(dailyOverrides));
+        localStorage.setItem('sc_log_v2', JSON.stringify(checkInLog));
+    }
+    function saveKey() { localStorage.setItem('sc_api_key_v2', document.getElementById('apiKey').value); }
+    function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+    window.onload = function() {
+        if(localStorage.getItem('sc_api_key_v2')) document.getElementById('apiKey').value = localStorage.getItem('sc_api_key_v2');
+        const today = new Date();
+        document.getElementById('current-date-str').innerText = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+        renderWeekBar();
+        renderRoutine();
+        renderProducts();
+    }
+
+    function renderWeekBar() {
+        const buttons = document.querySelectorAll('.day-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        let targetIndex = selectedDay === 0 ? 6 : selectedDay - 1;
+        buttons[targetIndex].classList.add('active');
+    }
+
+    function switchDay(day) { selectedDay = day; renderWeekBar(); renderRoutine(); }
+    function getTodayDateStr() { const today = new Date(); return `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`; }
+
+    // --- 日程及打卡表排版渲染 ---
+    function renderRoutine() {
+        const morningContainer = document.getElementById('morning-tasks');
+        const nightContainer = document.getElementById('night-tasks');
+        const tagM = document.getElementById('tag-m');
+        const tagN = document.getElementById('tag-n');
+
+        let plan = weeklyRoutine[selectedDay] || { morning: [], night: [] };
+        let isOverridden = false;
+
+        if (selectedDay === currentTodayDay) {
+            const todayStr = getTodayDateStr();
+            if (dailyOverrides[todayStr]) { plan = dailyOverrides[todayStr]; isOverridden = true; }
+        }
+
+        if (isOverridden) {
+            tagM.innerText = "今日特殊急救中"; tagM.className = "type-tag tag-temp";
+            tagN.innerText = "今日特殊急救中"; tagN.className = "type-tag tag-temp";
+        } else {
+            tagM.innerText = "周循环常规"; tagM.className = "type-tag tag-law";
+            tagN.innerText = "周循环常规"; tagN.className = "type-tag tag-law";
+        }
+
+        const todayStr = getTodayDateStr();
+        
+        // 渲染早间
+        const activeMorningIds = plan.morning.filter(pId => products[pId]);
+        morningContainer.innerHTML = activeMorningIds.length === 0 ? '<div style="color:var(--text-muted); font-size:13px;">无设定产品</div>' : '';
+        plan.morning.forEach(pId => { if(products[pId]) morningContainer.appendChild(createTaskNode(todayStr, 'morning', pId, products[pId])); });
+
+        // 渲染晚间
+        const activeNightIds = plan.night.filter(pId => products[pId]);
+        nightContainer.innerHTML = activeNightIds.length === 0 ? '<div style="color:var(--text-muted); font-size:13px;">无设定产品</div>' : '';
+        plan.night.forEach(pId => { if(products[pId]) nightContainer.appendChild(createTaskNode(todayStr, 'night', pId, products[pId])); });
+    }
+
+    function createTaskNode(dateStr, period, pId, product) {
+        const logKey = `${dateStr}_${selectedDay}_${period}_${pId}`;
+        const isChecked = checkInLog[logKey] ? 'checked' : '';
+        const div = document.createElement('div');
+        div.className = 'task-item';
+        div.innerHTML = `
+            <div class="checkbox-wrapper"><input type="checkbox" ${isChecked} onclick="toggleCheckIn('${logKey}', this)"><div class="checkmark"></div></div>
+            <div class="task-info">
+                <div class="task-name">${product.name} <span style="font-size:10px; color:var(--neon-blue); border:1px solid var(--border); padding:1px 4px; border-radius:3px;">${product.category}</span></div>
+                <div class="task-effect">⚡ ${product.effect}</div>
+            </div>
+        `;
+        return div;
+    }
+
+    function toggleCheckIn(logKey, checkbox) { checkInLog[logKey] = checkbox.checked; saveData(); setTimeout(renderRoutine, 150); }
+
+    // --- 产品资产渲染 ---
+    function renderProducts() {
+        const container = document.getElementById('assets-card-container');
+        container.innerHTML = '';
+        const today = new Date();
+
+        categoriesList.forEach(cat => {
+            const filteredIds = Object.keys(products).filter(id => products[id].category === cat);
+            if(filteredIds.length === 0) return; 
+
+            const catBlock = document.createElement('div');
+            catBlock.className = 'category-block';
+            catBlock.innerHTML = `<div class="category-title">${cat} (${filteredIds.length})</div>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'prod-grid';
+
+            filteredIds.forEach(id => {
+                const p = products[id];
+                const expDate = new Date(p.expiryDate);
+                const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                let alertStyle = '', alertText = `剩 ${diffDays} 天`;
+                if (diffDays <= 0) { alertStyle = 'expiry-alert'; alertText = '已过期！'; }
+                else if (diffDays <= 90) { alertStyle = 'expiry-alert'; alertText = `即将过期`; }
+
+                const card = document.createElement('div');
+                card.className = 'prod-card';
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deleteProduct('${id}')" title="删除该产品">×</button>
+                    <div class="prod-name">${p.name}</div>
+                    <div class="prod-meta" style="color: var(--neon-blue);">功效: ${p.effect}</div>
+                    <div class="prod-meta">成分: ${p.ingredients || '暂无'}</div>
+                    <div class="prod-meta ${alertStyle}" style="margin-top:5px; font-size:10px;">有效期: ${p.expiryDate} (${alertText})</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            catBlock.appendChild(grid);
+            container.appendChild(catBlock);
+        });
+
+        if(Object.keys(products).length === 0) {
+            container.innerHTML = '<div style="color:var(--text-muted); text-align:center; font-size:13px; padding:20px;">资产库空空如也，点击右上角录入吧</div>';
+        }
+    }
+
+    // --- 优化后的删除护肤品功能：仅移出资产，保留周计划槽位 ---
+    function deleteProduct(id) {
+        if(!products[id]) return;
+        const confirmDelete = confirm(`确认要删除 [ ${products[id].name} ] 吗？\n\n💡 提示：该产品将移出资产库，但计划中的对应任务位置会保留（当前会暂时隐藏），直到你用相同ID的新品替代或让AI重设。`);
+        if(confirmDelete) {
+            delete products[id]; // 仅在资产字典中删除
+            saveData();
+            renderProducts();
+            renderRoutine(); // 打卡流程渲染时会自动过滤隐藏无资产的ID，但底层数组未被破坏
+        }
+    }
+
+    // --- 导出 Excel 离线独立数据下载 ---
+    function exportToExcel() {
+        if(Object.keys(products).length === 0) return alert("当前没有护肤品可以导出表格哦！");
+        
+        const excelData = Object.keys(products).map(id => {
+            const p = products[id];
+            return {
+                "产品名称": p.name,
+                "分类成分": `[${p.category}] ${p.ingredients || '未录入'}`,
+                "核心功效": p.effect,
+                "有效期至": p.expiryDate
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "我的护肤资产库");
+        worksheet["!cols"] = [ {wch: 24}, {wch: 30}, {wch: 26}, {wch: 14} ];
+        XLSX.writeFile(workbook, `我的护肤品资产库_${getTodayDateStr()}.xlsx`);
+    }
+
+    // 通用大模型处理器接口
+    async function callLLM(prompt) {
+        const key = getApiKey();
+        if(!key) return null;
+        try {
+            const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                body: JSON.stringify({ model: "deepseek-ai/DeepSeek-V3", messages: [{ role: "user", content: prompt }], temperature: 0.2 })
+            });
+            const data = await response.json();
+            return data.choices[0].message.content;
+        } catch (e) { alert("网络通道连接中断，请核准 API KEY。"); return null; }
+    }
+
+    // 录入分配品类引导
+    async function triggerAddProduct() {
+        const fullName = prompt("请输入护肤品名称：");
+        if(!fullName) return;
+        
+        let chosenCategory = prompt(`选择分类序号：\n1. 洁面  2. 保湿水  3. 精华\n4. 面霜  5. 防晒  6. 其他说明`, "3");
+        let category = "精华";
+        if(chosenCategory==="1") category="洁面";
+        else if(chosenCategory==="2") category="保湿水";
+        else if(chosenCategory==="3") category="精华";
+        else if(chosenCategory==="4") category="面霜";
+        else if(chosenCategory==="5") category="防晒";
+        else if(chosenCategory==="6") category="面膜/眼霜/特殊处理";
+
+        const expiry = prompt("请输入限用日期(YYYY-MM-DD)：", "2027-12-31");
+        const pid = 'p_' + Date.now();
+        const key = getApiKey();
+
+        if(!key) {
+            products[pid] = { name: fullName, category: category, effect: "基础补水调养", ingredients: "基础多元醇", expiryDate: expiry };
+            saveData(); renderProducts(); return;
+        }
+
+        alert("🔍 AI 正在针对该品名进行知识库快速检索提炼...");
+        const pPrompt = `
+            请针对护肤品: "${fullName}"。提炼其最核心的1个主要功效和主要活性成分。
+            严格按以下格式输出，不要有额外字眼：
+            [EFFECT]核心功效（15字内）
+            [INGREDIENTS]核心成分1、成分2
+        `;
+        const res = await callLLM(pPrompt);
+        if(res) {
+            const effect = res.split('[EFFECT]')[1]?.split('[INGREDIENTS]')[0]?.trim() || "精简修护";
+            const ingredients = res.split('[INGREDIENTS]')[1]?.trim() || "活性复配物";
+            products[pid] = { name: fullName, category: category, effect: effect, ingredients: ingredients, expiryDate: expiry };
+            saveData(); renderProducts(); renderRoutine();
+            alert(`🎉 智能录入匹配成功！放入分类: [${category}]`);
+        }
+    }
+
+    // 格式化解析模块
+    async function parseRawWeeklyPlan() {
+        const rawText = document.getElementById('raw-plan-input').value.trim();
+        if(!rawText) return alert("请先粘贴大模型给出的循环护肤排班文本方案！");
+        const key = getApiKey();
+        if(!key) return alert("该自动化导入功能必须配置有效的 API Key 才能运作。");
+        
+        alert("⚡ 正在执行文本到本地资产 ID 的对齐转换...");
+        const parsePrompt = `
+            根据用户的文本，匹配到其拥有的产品库ID。
+            用户资产库: ${JSON.stringify(products)}
+            输入文案: """${rawText}"""
+            必须输出标准规范的0-6星期的完整格式JSON，不要夹杂markdown：
+            [JSON]{"1":{"morning":["p1"],"night":["p1"]},"2":{"morning":["p1"],"night":["p1"]},"3":{"morning":["p1"],"night":["p1"]},"4":{"morning":["p1"],"night":["p1"]},"5":{"morning":["p1"],"night":["p1"]},"6":{"morning":["p1"],"night":["p1"]},"0":{"morning":["p1"],"night":["p1"]}}
+        `;
+        const res = await callLLM(parsePrompt);
+        if(res) {
+            try {
+                const jsonStr = res.split('[JSON]')[1]?.trim() || res.trim();
+                weeklyRoutine = JSON.parse(jsonStr);
+                saveData(); renderRoutine();
+                alert("🎉 周日程安排刷新匹配成功！");
+                document.getElementById('raw-plan-input').value = '';
+            } catch (e) { alert("转换数据异常，请确保输入可读性。"); }
+        }
+    }
+
+    // 突发顾问策略模块
+    async function askAIConsultant() {
+        const userInput = document.getElementById('ai-input').value.trim();
+        if(!userInput) return alert("请先描述当下的皮肤诉求；");
+        const key = getApiKey();
+
+        const responseBox = document.getElementById('aiResponseBox');
+        const textAdvice = document.getElementById('ai-text-advice');
+        responseBox.style.display = 'block';
+        textAdvice.innerText = '🤖 AI 正在精确评估周期覆盖率，请稍后...';
+
+        const consultantPrompt = `
+            分析用户突发状况。如果是当天临时反应（如：熬夜、过敏、今日暴晒），SCOPE 为 TODAY。
+            如果是改变后续生活环境或周期护理（如：长期脱皮、入冬、最近打算开始刷酸），SCOPE 为 WEEKLY。
+            当前皮肤问题: "${userInput}"
+            当前产品库: ${JSON.stringify(products)}
+            原本周循环计划: ${JSON.stringify(weeklyRoutine)}
+            隔离格式输出：
+            [SCOPE]TODAY 或 WEEKLY
+            [ADVICE]专业护肤建议...
+            [JSON]一套完整的0-6星期计划结构数据
+        `;
+
+        if(!key) {
+            setTimeout(() => {
+                let simulatedJson = JSON.parse(JSON.stringify(weeklyRoutine));
+                let scope = userInput.includes("今天") || userInput.includes("突发") || userInput.includes("暴晒") ? "TODAY" : "WEEKLY";
+                let advice = "【本地模拟建议】检测到你的问题，点击确认应用将完美按照长/短周期写入本地内核。";
+                if(scope === "TODAY") {
+                    let todayDay = new Date().getDay();
+                    simulatedJson[todayDay] = { morning: ["p1", "p3", "p4"], night: ["p1", "p3"] };
+                }
+                tempAiDecision = { scope: scope, plan: simulatedJson };
+                textAdvice.innerText = `【变动机制：${scope==='TODAY'?'单日急救(仅改今天)':'长期周计划调整'}】\n\n${advice}`;
+            }, 1000);
+        } else {
+            const res = await callLLM(consultantPrompt);
+            if(res) {
+                try {
+                    const scope = res.split('[SCOPE]')[1]?.split('[ADVICE]')[0]?.trim();
+                    const advice = res.split('[ADVICE]')[1]?.split('[JSON]')[0]?.trim();
+                    const jsonStr = res.split('[JSON]')[1]?.trim();
+                    tempAiDecision = { scope: scope, plan: JSON.parse(jsonStr) };
+                    textAdvice.innerText = `【变动机制：${scope === 'TODAY' ? '单日急救(仅改今天打卡)' : '长期周循环调整'}】\n\n${advice}`;
+                } catch (e) { textAdvice.innerText = "大模型格式吐回失败，请稍后重试。"; }
+            }
+        }
+    }
+
+    function applyAiAdjustment() {
+        if(!tempAiDecision) return;
+        if(tempAiDecision.scope === 'TODAY') {
+            const todayStr = getTodayDateStr();
+            const todayDay = new Date().getDay();
+            dailyOverrides[todayStr] = tempAiDecision.plan[todayDay];
+            alert("🎯 单日临时调理已切入！今日流程已特殊重组，明天将重加载常规表。");
+        } else {
+            weeklyRoutine = tempAiDecision.plan;
+            alert("📅 长期周循环课表已成功被大模型重新编排！");
+        }
+        saveData(); renderRoutine();
+        document.getElementById('aiResponseBox').style.display = 'none';
+        document.getElementById('ai-input').value = '';
+        tempAiDecision = null;
+    }
+
+    // PWA 离线服务挂载
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('GlowFlow 离线沙盒安全挂载就绪'))
+            .catch((err) => console.log('PWA Error', err));
+    }
+</script>
+</body>
+</html>
