@@ -3,353 +3,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowFlow || 智能护肤管理系统 v1.0-Core</title>
+    <title>GlowFlow || 智能护肤系统 Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
         body {
-            background-color: #0a051b;
+            background-color: #0d0b18;
             color: #e2e8f0;
             font-family: 'Noto Sans SC', sans-serif;
-            background-image: radial-gradient(circle at 50% 20%, #1e0b36 0%, #0a051b 80%);
+            background-image: radial-gradient(circle at 50% 10%, #1a1235 0%, #0d0b18 70%);
         }
         .cyber-brand {
             font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
+            text-shadow: 0 0 10px #00f2fe, 0 0 20px #9d4edd;
         }
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+        }
+        .neon-btn-active {
+            background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.6);
+            color: #ffffff !important;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0b18; }
+        ::-webkit-scrollbar-thumb { background: #3b2d54; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-24">
 
     <!-- Header -->
-    <header class="border-b border-purple-900 bg-black/40 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+    <header class="border-b border-purple-950/60 bg-black/40 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
-                <h1 class="text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 cyber-brand">GlowFlow</h1>
-                <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/50">v1.0 纯净稳定版</span>
+                <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
+                <h1 class="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 cyber-brand">GlowFlow</h1>
+                <span class="text-[10px] bg-purple-950/60 text-purple-300 px-2 py-0.5 rounded border border-purple-800/30">v3.0 Hybrid</span>
             </div>
-            <!-- Tab Buttons using simple vanilla JS toggle -->
-            <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
-                <button id="btn-tab-routine" onclick="showTab('routine')" class="px-5 py-2 rounded-lg font-medium text-sm transition-all bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
-                    🗓️ 周程日程表
+            <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-800/80">
+                <button id="tab-btn-routine" onclick="switchMainTab('routine')" class="px-4 py-1.5 rounded-lg font-medium text-xs transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
+                    🗓️ 每日打卡
                 </button>
-                <button id="btn-tab-inventory" onclick="showTab('inventory')" class="px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-400 hover:text-slate-200">
-                    🧪 护肤品资产库
+                <button id="tab-btn-inventory" onclick="switchMainTab('inventory')" class="px-4 py-1.5 rounded-lg font-medium text-xs transition-all text-slate-400 hover:text-slate-200">
+                    📦 资产管理
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 mt-6">
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- ==================== API KEY PANEL ==================== -->
-        <section class="mb-6">
-            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-4 border border-slate-800">
-                <h3 class="text-xs font-medium text-cyan-400 mb-2">🔑 硅基流动 SiliconFlow API 密钥通道</h3>
-                <div class="flex gap-2">
-                    <input type="password" id="global-api-key" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" placeholder="请输入以 sk- 开头的密钥...">
-                    <button onclick="alert('密钥已临时同步至页面运行内存！')" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs px-4 py-1.5 rounded-xl font-bold transition">
-                        保存配置
+        <!-- ==================== KEY CONFIG ==================== -->
+        <section class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-4 border border-slate-800/60 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-cyan-400 font-bold tracking-wide">🔑 SiliconFlow API 密钥通道</span>
+                </div>
+                <div class="flex gap-2 flex-1 sm:max-w-md">
+                    <input type="password" id="api-key-input" onchange="saveApiKey()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" placeholder="请输入以 sk- 开头的密钥...">
+                    <button onclick="saveApiKey(); alert('密钥保存成功！')" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs px-3 py-1.5 rounded-xl font-bold transition-all shrink-0">
+                        储存
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- ==================== TAB 1: ROUTINE SECTION ==================== -->
-        <section id="panel-routine" class="block space-y-6">
-            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-2xl">
+        <!-- ==================== TAB 1: ROUTINE PANEL ==================== -->
+        <div id="main-panel-routine" class="space-y-4">
+            
+            <!-- Weekday Switcher Dashboard -->
+            <div class="bg-slate-950/40 border border-slate-900 rounded-2xl p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-300">📅 ROUTINE 打卡管理</span>
+                    </div>
+                    <span class="text-xs font-mono text-cyan-400">2026-05-24</span>
+                </div>
                 
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-cyan-400 flex items-center gap-2">🗓️ 独立高效周日程表</h2>
-                        <p class="text-xs text-slate-400 mt-1">最纯粹的原生输入框架构，可自由复制、粘贴、修改，永不假死报错。</p>
+                <!-- Day Tabs (Mon - Sun) -->
+                <div class="grid grid-cols-7 gap-2">
+                    <button onclick="switchRoutineDay(1)" id="day-tab-1" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">一</button>
+                    <button onclick="switchRoutineDay(2)" id="day-tab-2" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">二</button>
+                    <button onclick="switchRoutineDay(3)" id="day-tab-3" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">三</button>
+                    <button onclick="switchRoutineDay(4)" id="day-tab-4" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">四</button>
+                    <button onclick="switchRoutineDay(5)" id="day-tab-5" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">五</button>
+                    <button onclick="switchRoutineDay(6)" id="day-tab-6" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">六</button>
+                    <button onclick="switchRoutineDay(0)" id="day-tab-0" class="py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center">日</button>
+                </div>
+            </div>
+
+            <!-- Routine Cards Display Area -->
+            <div class="space-y-4">
+                <!-- Morning Container -->
+                <div class="bg-slate-950/50 border border-slate-900 rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-900 pb-2">
+                        <span class="text-amber-400 text-sm">☀️</span>
+                        <h3 class="text-sm font-bold text-cyan-400">Morning 早间流程</h3>
+                        <span class="text-[10px] bg-cyan-950/50 text-cyan-400 px-2 py-0.5 rounded border border-cyan-900/40">周循环常规</span>
+                    </div>
+                    <div id="morning-list" class="space-y-2">
+                        <!-- Dynamic items -->
                     </div>
                 </div>
 
-                <!-- Bulk Text Importer -->
-                <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 mb-6">
-                    <h3 class="text-sm font-medium text-purple-400 mb-2">⚡ 快捷全文本一键照搬/备份面板</h3>
-                    <p class="text-xs text-slate-400 mb-2">把全周计划粘贴到下面，点击紫色按钮即可自动提取并填入到下面各天的输入框中：</p>
-                    <textarea id="raw-bulk-text" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 focus:outline-none focus:border-purple-500" placeholder="周一：&#10;早：雅诗兰黛微精华，珀莱雅双抗，防晒&#10;晚：雅诗兰黛微精华，水杨酸棉片&#10;&#10;周二：&#10;..."></textarea>
-                    <div class="flex justify-end mt-2">
-                        <button onclick="parseTextToInputs()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">
-                            ⚡ 智能识别并分发到下方表格
+                <!-- Night Container -->
+                <div class="bg-slate-950/50 border border-slate-900 rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-900 pb-2">
+                        <span class="text-indigo-400 text-sm">🌙</span>
+                        <h3 class="text-sm font-bold text-pink-500">Night 晚间流程</h3>
+                        <span class="text-[10px] bg-pink-950/50 text-pink-400 px-2 py-0.5 rounded border border-pink-900/40">周循环常规</span>
+                    </div>
+                    <div id="night-list" class="space-y-2">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== AI SKIN ADVISOR ==================== -->
+            <section class="bg-gradient-to-br from-indigo-950/40 to-slate-950/80 border border-purple-900/40 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <h3 class="text-sm font-bold text-purple-300">🚨 AI 突发皮肤顾问</h3>
+                    <span class="text-[10px] text-slate-400">(爆痘、脱皮、红肿应急处理)</span>
+                </div>
+                <div class="space-y-3">
+                    <div id="advisor-response" class="hidden text-xs bg-black/40 p-3 rounded-xl border border-slate-800 text-slate-300 leading-relaxed max-h-48 overflow-y-auto">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="advisor-input" class="flex-1 bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500" placeholder="例：下巴突然长了硬肿大痘、换季两颊发红脱皮，该怎么救急？">
+                        <button onclick="askSkinAdvisor()" id="advisor-btn" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs px-4 py-2 rounded-xl font-medium transition-all">
+                            咨询AI
                         </button>
                     </div>
                 </div>
+            </section>
+        </div>
 
-                <!-- Static Form List (One by One to Guarantee Loading) -->
-                <div class="space-y-4">
-                    
-                    <!-- Mon -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周一 ➔ 局部疏通日 (KO闭口)
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-1" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、珀莱雅双抗、兰蔻眼霜、珂润面霜、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-1" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、Stridex水杨酸棉片（局部）、雅诗兰黛眼霜、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tue -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周二 ➔ 深度修护日 (给皮肤放假)
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-2" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、兰蔻眼霜、优时颜乳液/珂润面霜、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-2" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、雅诗兰黛眼霜、理肤泉B5面霜（修护）">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Wed -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周三 ➔ 黄金抗老抗衰日 (主场)
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-3" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="优时颜水、珀莱雅双抗、兰蔻眼霜、优时颜乳液、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-3" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、自然堂小紫瓶精华霜、雅诗兰黛眼霜、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thu -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周四 ➔ 黄金抗老抗衰日 (主场)
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-4" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="优时颜水、珀莱雅双抗、兰蔻眼霜、优时颜乳液、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-4" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、自然堂小紫瓶精华霜、雅诗兰黛眼霜、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Fri -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周五 ➔ 美白淡印日
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-5" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="优时颜水、珀莱雅双抗、兰蔻眼霜、优时颜乳液、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-5" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、Olay ProX白瓶精华、雅诗兰黛眼霜、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sat -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span> 周六 ➔ 温和滋养日
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-6" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、珀莱雅双抗、兰蔻眼霜、珂润面霜、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-6" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华、养生堂冬孕精华液、雅诗兰黛眼霜、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sun -->
-                    <div class="p-4 rounded-xl border bg-slate-900/40 border-slate-800">
-                        <h3 class="font-bold text-sm text-rose-400 mb-3 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-rose-500"></span> 周日 ➔ 肌断食日
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-xs font-semibold text-amber-400 mb-1">☀️ 早晨日程：</div>
-                                <input type="text" id="morn-0" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="清水洗脸、珂润面霜、防晒">
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-indigo-400 mb-1">🌙 晚间日程：</div>
-                                <input type="text" id="night-0" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200" value="雅诗兰黛微精华（或温和保湿水）、珂润面霜">
-                            </div>
-                        </div>
-                    </div>
-
+        <!-- ==================== TAB 2: INVENTORY PANEL ==================== -->
+        <div id="main-panel-inventory" class="hidden space-y-6">
+            
+            <!-- Smart AI Product Entry -->
+            <div class="bg-slate-950/60 border border-slate-900 rounded-2xl p-5 shadow-xl space-y-4">
+                <div>
+                    <h2 class="text-sm font-bold text-pink-500 flex items-center gap-2">🧪 智能网络 AI 录入新资产</h2>
+                    <p class="text-[11px] text-slate-400 mt-0.5">只需给出名称和过期日，AI 会联网/检索核心成分、主打功效并智能归类。</p>
                 </div>
-            </div>
-        </section>
-
-        <!-- ==================== TAB 2: INVENTORY SECTION ==================== -->
-        <section id="panel-inventory" class="hidden space-y-6">
-            <!-- Add Product -->
-            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-2xl">
-                <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2">🧪 录入新护肤资产</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">产品名称</label>
-                        <input type="text" id="new-prod-name" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200" placeholder="如：雅诗兰黛微精华">
+                        <label class="block text-[11px] text-slate-400 mb-1">产品名称</label>
+                        <input type="text" id="ai-prod-name" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200" placeholder="如：修丽可CE精粹VC精华">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">主打功效</label>
-                        <input type="text" id="new-prod-effect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200" placeholder="如：抗氧去黄、强韧修护">
+                        <label class="block text-[11px] text-slate-400 mb-1">限用日期 (到期时间)</label>
+                        <input type="date" id="ai-prod-expiry" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
                     </div>
-                    <div class="flex items-end">
-                        <button onclick="addNewProductCard()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white font-medium py-2 rounded-xl text-xs shadow-lg">
-                            ➕ 添加至下方资产库
-                        </button>
-                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button onclick="smartAiAddProduct()" id="smart-add-btn" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 text-white font-medium px-6 py-2 rounded-xl text-xs shadow-lg transition-all">
+                        ✨ AI 检索并一键上架
+                    </button>
                 </div>
             </div>
 
-            <!-- List Inventory -->
-            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-2xl">
-                <h2 class="text-xl font-bold text-slate-200 mb-4">📦 当前储备物资清单</h2>
-                <div id="pure-products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Default Static Cards -->
-                    <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-bold text-sm text-slate-200">雅诗兰黛微精华</h4>
-                                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">保湿水</span>
-                            </div>
-                            <p class="text-xs text-slate-400"><span class="text-slate-600">主打功效：</span>维稳修护、强韧肌底</p>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-bold text-sm text-slate-200">珀莱雅双抗</h4>
-                                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">功效精华</span>
-                            </div>
-                            <p class="text-xs text-slate-400"><span class="text-slate-600">主打功效：</span>抗氧化、去黄提亮</p>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-bold text-sm text-slate-200">珂润面霜</h4>
-                                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">面霜乳液</span>
-                            </div>
-                            <p class="text-xs text-slate-400"><span class="text-slate-600">主打功效：</span>温和高保湿、锁水修护</p>
-                        </div>
-                    </div>
+            <!-- Inventory Grid Categorized -->
+            <div class="space-y-6">
+                <!-- 1. 洁面 -->
+                <div class="inventory-category-block" id="cat-block-cleanser">
+                    <h3 class="text-xs font-bold text-cyan-400 border-l-2 border-cyan-500 pl-2 mb-3">洁面</h3>
+                    <div id="grid-cleanser" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+                <!-- 2. 保湿水 -->
+                <div class="inventory-category-block" id="cat-block-toner">
+                    <h3 class="text-xs font-bold text-cyan-400 border-l-2 border-cyan-500 pl-2 mb-3">保湿水</h3>
+                    <div id="grid-toner" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+                <!-- 3. 精华 -->
+                <div class="inventory-category-block" id="cat-block-serum">
+                    <h3 class="text-xs font-bold text-cyan-400 border-l-2 border-cyan-500 pl-2 mb-3">精华</h3>
+                    <div id="grid-serum" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+                <!-- 4. 面霜/乳液 -->
+                <div class="inventory-category-block" id="cat-block-cream">
+                    <h3 class="text-xs font-bold text-cyan-400 border-l-2 border-cyan-500 pl-2 mb-3">面霜/乳液</h3>
+                    <div id="grid-cream" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+                <!-- 5. 其他 -->
+                <div class="inventory-category-block" id="cat-block-other">
+                    <h3 class="text-xs font-bold text-cyan-400 border-l-2 border-cyan-500 pl-2 mb-3">其他</h3>
+                    <div id="grid-other" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                 </div>
             </div>
-        </section>
+        </div>
 
     </main>
 
     <script>
-        // Native Tab Switch Engine - 100% stable, no variables dependencies
-        function showTab(tabName) {
-            const pRoutine = document.getElementById('panel-routine');
-            const pInventory = document.getElementById('panel-inventory');
-            const bRoutine = document.getElementById('btn-tab-routine');
-            const bInventory = document.getElementById('btn-tab-inventory');
+        // --- DATA STORE ---
+        // Decoupled Static Initial Routines (Snapshots, no reference linked to asset ids)
+        let initialRoutines = {
+            1: {
+                morning: ["修丽可 氨基酸洁面奶", "修丽可 CE精粹VC精华", "理肤泉 B5万能修护霜", "安热沙 金瓶防晒乳"],
+                night: ["修丽可 氨基酸洁面奶", "Stridex水杨酸棉片", "雅诗兰黛眼霜", "珂润面霜"]
+            },
+            2: {
+                morning: ["温和洁面", "优时颜乳液", "防晒"],
+                night: ["修丽可 氨基酸洁面奶", "理肤泉 B5万能修护霜"]
+            },
+            3: {
+                morning: ["修丽可 氨基酸洁面奶", "珀莱雅双抗", "防晒"],
+                night: ["雅诗兰黛微精华", "自然堂小紫瓶精华霜", "珂润面霜"]
+            },
+            4: {
+                morning: ["修丽可 氨基酸洁面奶", "珀莱雅双抗", "防晒"],
+                night: ["雅诗兰黛微精华", "自然堂小紫瓶精华霜", "珂润面霜"]
+            },
+            5: {
+                morning: ["温和洁面", "珀莱雅双抗", "防晒"],
+                night: ["雅诗兰黛微精华", "Olay ProX白瓶精华", "珂润面霜"]
+            },
+            6: {
+                morning: ["修丽可 氨基酸洁面奶", "珀莱雅双抗", "防晒"],
+                night: ["雅诗兰黛微精华", "养生堂冬孕精华液", "珂润面霜"]
+            },
+            0: {
+                morning: ["清水洗脸", "珂润面霜", "防晒"],
+                night: ["温和保湿水", "珂润面霜"]
+            }
+        };
 
-            if(tabName === 'routine') {
-                pRoutine.style.display = 'block';
-                pInventory.style.display = 'none';
-                bRoutine.className = "px-5 py-2 rounded-lg font-medium text-sm transition-all bg-gradient-to-r from-cyan-500 to-blue-600 text-white";
-                bInventory.className = "px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-400 hover:text-slate-200";
+        // Initialize user routine item check states
+        let routineCheckedStates = {}; 
+
+        // Static Initial Inventory
+        let inventoryProducts = [
+            { id: "p1", name: "修丽可 氨基酸洁面奶", type: "洁面", efficacy: "温和清洁，无负担", ingredients: "甘氨酸、椰油酰", expiryDate: "2027-05-01" },
+            { id: "p2", name: "兰蔻 极光保湿水", type: "保湿水", efficacy: "抛光角质、改善暗沉平衡", ingredients: "榉木精囊、水杨酸", expiryDate: "2026-11-20" },
+            { id: "p3", name: "修丽可 CE精粹VC精华", type: "精华", efficacy: "抗氧化、提亮、抗光老化", ingredients: "15%左旋C + 1%维生素E", expiryDate: "2026-10-15" },
+            { id: "p4", name: "理肤泉 B5万能修护霜", type: "面霜/乳液", efficacy: "深层舒缓、强韧屏障、褪红", ingredients: "维生素B5、积雪草苷", expiryDate: "2027-02-01" },
+            { id: "p5", name: "露得清 0.5%A醇晚霜", type: "面霜/乳液", efficacy: "抗衰老、抗皱、加速角质代谢", ingredients: "视黄醇 (A醇)", expiryDate: "2026-12-30" }
+        ];
+
+        let currentSelectedDay = 0; // Default to Sunday for presentation match
+
+        // --- CORE LIFE CYCLE ---
+        window.onload = function() {
+            // Load key from storage if exists
+            const savedKey = localStorage.getItem('glowflow_api_key');
+            if (savedKey) {
+                document.getElementById('api-key-input').value = savedKey;
+            }
+            
+            // Sync default date
+            const todayNum = new Date().getDay();
+            currentSelectedDay = todayNum;
+            
+            // Pre-populate unique checklist ids
+            for (let day in initialRoutines) {
+                routineCheckedStates[day] = {
+                    morning: initialRoutines[day].morning.map(() => false),
+                    night: initialRoutines[day].night.map(() => false)
+                };
+            }
+
+            switchRoutineDay(currentSelectedDay);
+            renderInventoryGrid();
+        };
+
+        // --- TAB SWITCH ENGINE ---
+        function switchMainTab(target) {
+            const rPanel = document.getElementById('main-panel-routine');
+            const iPanel = document.getElementById('main-panel-inventory');
+            const rBtn = document.getElementById('tab-btn-routine');
+            const iBtn = document.getElementById('tab-btn-inventory');
+
+            if (target === 'routine') {
+                rPanel.style.display = 'block';
+                iPanel.style.display = 'none';
+                rBtn.className = "px-4 py-1.5 rounded-lg font-medium text-xs transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg";
+                iBtn.className = "px-4 py-1.5 rounded-lg font-medium text-xs transition-all text-slate-400 hover:text-slate-200";
             } else {
-                pRoutine.style.display = 'none';
-                pInventory.style.display = 'block';
-                bInventory.className = "px-5 py-2 rounded-lg font-medium text-sm transition-all bg-gradient-to-r from-pink-500 to-rose-600 text-white";
-                bRoutine.className = "px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-400 hover:text-slate-200";
+                rPanel.style.display = 'none';
+                iPanel.style.display = 'block';
+                iBtn.className = "px-4 py-1.5 rounded-lg font-medium text-xs transition-all bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg";
+                rBtn.className = "px-4 py-1.5 rounded-lg font-medium text-xs transition-all text-slate-400 hover:text-slate-200";
             }
         }
 
-        // Pure DOM Parser - reads text and sets inputs value explicitly
-        function parseTextToInputs() {
-            const txt = document.getElementById('raw-bulk-text').value.trim();
-            if(!txt) {
-                alert("请输入全文本计划内容！");
-                return;
+        function switchRoutineDay(dayNum) {
+            currentSelectedDay = dayNum;
+            // Highlight Day Button
+            for(let i=0; i<=6; i++) {
+                document.getElementById(`day-tab-${i}`).className = "py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 font-medium text-sm transition-all text-center";
             }
+            document.getElementById(`day-tab-${dayNum}`).className = "py-2.5 rounded-xl text-center font-bold text-sm neon-btn-active transition-all";
 
-            const lines = txt.split('\n');
-            let currentDay = null;
-
-            for(let i=0; i<lines.length; i++) {
-                let line = lines[i].trim();
-                if(!line) continue;
-
-                if (line.includes("周一") || line.includes("星期一")) currentDay = 1;
-                else if (line.includes("周二") || line.includes("星期二")) currentDay = 2;
-                else if (line.includes("周三") || line.includes("星期三")) currentDay = 3;
-                else if (line.includes("周四") || line.includes("星期四")) currentDay = 4;
-                else if (line.includes("周五") || line.includes("星期五")) currentDay = 5;
-                else if (line.includes("周六") || line.includes("星期六")) currentDay = 6;
-                else if (line.includes("周日") || line.includes("星期日") || line.includes("周天")) currentDay = 0;
-
-                if(currentDay !== null) {
-                    if(line.startsWith("早：") || line.startsWith("早") || line.includes("早晨")) {
-                        let val = line.replace(/^早[：:]?/, '').trim();
-                        let target = document.getElementById('morn-' + currentDay);
-                        if(target) target.value = val;
-                    }
-                    if(line.startsWith("晚：") || line.startsWith("晚") || line.includes("晚间")) {
-                        let val = line.replace(/^晚[：:]?/, '').trim();
-                        let target = document.getElementById('night-' + currentDay);
-                        if(target) target.value = val;
-                    }
-                }
-            }
-            alert("⚡ 文本已成功解析并映射到下方表格中，请滚动查看修改！");
+            // Render Lists
+            renderRoutineSession('morning', 'morning-list');
+            renderRoutineSession('night', 'night-list');
         }
 
-        // Simple DOM Card Append
-        function addNewProductCard() {
-            const name = document.getElementById('new-prod-name').value.trim();
-            const effect = document.getElementById('new-prod-effect').value.trim();
-            if(!name) {
-                alert("请输入产品名称！");
+        function renderRoutineSession(sessionType, targetContainerId) {
+            const container = document.getElementById(targetContainerId);
+            container.innerHTML = '';
+            
+            const items = initialRoutines[currentSelectedDay][sessionType];
+            const checks = routineCheckedStates[currentSelectedDay][sessionType];
+
+            if(items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-600 italic py-2">今天这档没有排班，皮肤放轻松~</p>`;
                 return;
             }
 
-            const grid = document.getElementById('pure-products-grid');
-            const card = document.createElement('div');
-            card.className = "p-4 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col justify-between";
-            card.innerHTML = `
-                <div>
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-bold text-sm text-slate-200">${name}</h4>
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-pink-950 text-pink-400">新增资产</span>
+            items.forEach((itemName, index) => {
+                const isChecked = checks[index];
+                
+                // Extract classification badge hints if found in item text
+                let badgeHtml = '';
+                if(itemName.includes('洁面') || itemName.includes('洗脸')) badgeHtml = `<span class="text-[9px] bg-cyan-950 text-cyan-400 px-1 rounded border border-cyan-800/40">洁面</span>`;
+                else if(itemName.includes('精粹') || itemName.includes('精华') || itemName.includes('抗双')) badgeHtml = `<span class="text-[9px] bg-purple-950 text-purple-400 px-1 rounded border border-purple-800/40">精华</span>`;
+                else if(itemName.includes('霜')) badgeHtml = `<span class="text-[9px] bg-pink-950 text-pink-400 px-1 rounded border border-pink-800/40">面霜</span>`;
+                else if(itemName.includes('防晒') || itemName.includes('乳')) badgeHtml = `<span class="text-[9px] bg-amber-950 text-amber-400 px-1 rounded border border-amber-800/40">防护</span>`;
+                else badgeHtml = `<span class="text-[9px] bg-slate-800 text-slate-400 px-1 rounded">维护</span>`;
+
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-3 rounded-xl border border-slate-900/60 transition-all ${isChecked ? 'bg-slate-950/20 opacity-40' : 'bg-slate-900/30 hover:bg-slate-900/50'}`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 flex-1 cursor-pointer" onclick="toggleTaskCheck(${index}, '${sessionType}')">
+                        <div class="w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isChecked ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 bg-slate-950'}" id="chk-box-${sessionType}-${index}">
+                            ${isChecked ? '✓' : ''}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-medium text-slate-200 ${isChecked ? 'line-through text-slate-500' : ''}">${itemName}</span>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-400"><span class="text-slate-600">主打功效：</span>${effect || '基础保湿'}</p>
-                </div>
+                    <div class="flex items-center gap-2">
+                        ${badgeHtml}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleTaskCheck(index, sessionType) {
+            routineCheckedStates[currentSelectedDay][sessionType][index] = !routineCheckedStates[currentSelectedDay][sessionType][index];
+            renderRoutineSession(sessionType, sessionType === 'morning' ? 'morning-list' : 'night-list');
+        }
+
+        // --- INVENTORY MANAGER (FULLY DECOUPLED FROM ROUTINES) ---
+        function renderInventoryGrid() {
+            const categories = {
+                '洁面': 'grid-cleanser',
+                '保湿水': 'grid-toner',
+                '精华': 'grid-serum',
+                '面霜/乳液': 'grid-cream',
+                '其他': 'grid-other'
+            };
+
+            // Clear grids
+            for(let key in categories) {
+                document.getElementById(categories[key]).innerHTML = '';
+                document.getElementById(`cat-block-${getCategorySlug(key)}`).style.display = 'none';
+            }
+
+            const today = new Date();
+
+            inventoryProducts.forEach(prod => {
+                const gridId = categories[prod.type] || 'grid-other';
+                const gridContainer = document.getElementById(gridId);
+                
+                // Show parent block since it has items
+                document.getElementById(`cat-block-${getCategorySlug(prod.type)}`).style.display = 'block';
+
+                // Calculate remaining days
+                const expiry = new Date(prod.expiryDate);
+                const diffTime = expiry - today;
+                const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const daysText = remainingDays > 0 ? `剩 ${remainingDays} 天` : '已过期';
+
+                const card = document.createElement('div');
+                card.className = "p-4 bg-slate-900/40 rounded-xl border border-slate-850/80 flex flex-col justify-between relative group hover:border-purple-900/60 transition-all";
+                card.innerHTML = `
+                    <button onclick="deleteProduct('${prod.id}')" class="absolute top-2 right-3 text-slate-600 hover:text-rose-400 text-xs transition-colors p-1 font-bold">×</button>
+                    <div>
+                        <div class="flex justify-between items-start mb-1.5 pr-4">
+                            <h4 class="font-bold text-xs text-slate-100 tracking-wide">${prod.name}</h4>
+                        </div>
+                        <div class="space-y-1 text-[11px] leading-relaxed">
+                            <p class="text-slate-400"><span class="text-cyan-600 font-medium">功效：</span>${prod.efficacy}</p>
+                            <p class="text-slate-400"><span class="text-cyan-600 font-medium">成分：</span>${prod.ingredients}</p>
+                        </div>
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-900/60 flex justify-between items-center text-[10px] text-slate-500">
+                        <span>有效期: ${prod.expiryDate}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-purple-950/40 text-purple-400 font-mono">${daysText}</span>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function getCategorySlug(type) {
+            if(type === '洁面') return 'cleanser';
+            if(type === '保湿水') return 'toner';
+            if(type === '精华') return 'serum';
+            if(type === '面霜/乳液') return 'cream';
+            return 'other';
+        }
+
+        function deleteProduct(prodId) {
+            if(confirm("确定要移除这件护肤储备物资吗？(这不会破坏您的既定打卡日程表)")) {
+                inventoryProducts = inventoryProducts.filter(p => p.id !== prodId);
+                renderInventoryGrid();
+            }
+        }
+
+        function saveApiKey() {
+            const k = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('glowflow_api_key', k);
+        }
+
+        // --- SILICONFLOW API ENGINES ---
+        async function smartAiAddProduct() {
+            const apiKey = localStorage.getItem('glowflow_api_key');
+            if(!apiKey) return alert("请先在上方配置 SiliconFlow API 密钥");
+
+            const nameInput = document.getElementById('ai-prod-name').value.trim();
+            const dateInput = document.getElementById('ai-prod-expiry').value;
+
+            if(!nameInput || !dateInput) {
+                alert("请输入完整的产品名称和限用日期！");
+                return;
+            }
+
+            const btn = document.getElementById('smart-add-btn');
+            btn.innerText = "⚡ AI 正在联网检索并提取数据...";
+            btn.disabled = true;
+
+            const systemPrompt = `
+                你是一个专业的皮肤科专家与全球护肤品成分数据分析师。
+                根据给定的产品名称，通过你的深层知识库检索，将其精准结构化为JSON。
+                分类(type)必须严格是这五个之一："洁面", "保湿水", "精华", "面霜/乳液", "其他"。
+                
+                你必须严格只返回一个合法的 JSON 字符串，格式如下，不要包含任何 Markdown 格式或额外文字：
+                {
+                  "type": "类型",
+                  "efficacy": "核心功效(限18字以内，简练如：美白提亮、深层修护抗炎)",
+                  "ingredients": "核心活性成分(限18字以内，如：15%左旋C+VE、高浓度B5)"
+                }
             `;
-            grid.appendChild(card);
-            document.getElementById('new-prod-name').value = '';
-            document.getElementById('new-prod-effect').value = '';
-            alert("🧪 资产添加成功！");
+
+            try {
+                const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    model: "deepseek-ai/DeepSeek-V3", 
+                    messages: [
+                      { role: "system", content: systemPrompt },
+                      { role: "user", content: `护肤品名称: ${nameInput}` }
+                    ],
+                    response_format: { type: "json_object" },
+                    temperature: 0.1
+                  })
+                });
+
+                const data = await response.json();
+                const cleanJson = JSON.parse(data.choices[0].message.content);
+
+                // Insert into products library
+                const newProduct = {
+                    id: "p_" + Date.now(),
+                    name: nameInput,
+                    type: cleanJson.type || "其他",
+                    efficacy: cleanJson.efficacy || "基础维稳护理",
+                    ingredients: cleanJson.ingredients || "见产品瓶身",
+                    expiryDate: dateInput
+                };
+
+                inventoryProducts.unshift(newProduct);
+                renderInventoryGrid();
+
+                // Clear input
+                document.getElementById('ai-prod-name').value = '';
+                document.getElementById('ai-prod-expiry').value = '';
+                alert(`🧪 AI 智能上架成功！已自动为您归类至 [${cleanJson.type}]`);
+
+            } catch (error) {
+                console.error(error);
+                alert("AI 联网解析出错，请检查您的 API 密钥有效性或网络。");
+            } finally {
+                btn.innerText = "✨ AI 检索并一键上架";
+                btn.disabled = false;
+            }
+        }
+
+        async function askSkinAdvisor() {
+            const apiKey = localStorage.getItem('glowflow_api_key');
+            if(!apiKey) return alert("请先在上方配置 SiliconFlow API 密钥");
+
+            const q = document.getElementById('advisor-input').value.trim();
+            if(!q) return alert("请输入您的突发皮肤状况咨询问题。");
+
+            const btn = document.getElementById('advisor-btn');
+            const resDiv = document.getElementById('advisor-response');
+
+            btn.innerText = "诊断中...";
+            btn.disabled = true;
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<span class="text-purple-400 animate-pulse">🤖 AI 正在紧急调配应急处理方案，请稍候...</span>`;
+
+            try {
+                const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    model: "deepseek-ai/DeepSeek-V3", 
+                    messages: [
+                      { 
+                        role: "system", 
+                        content: "你是一个极其优秀的皮肤科顾问。当面对用户突发的爆痘、过敏脱皮、红肿刺痛等问题，你会立刻给出精炼、救急的安全解决方案。注意：要指出应当立刻停用哪些激进成分(如A醇、高浓度酸)，指导如何精简洁面和温和修护，字数在150字以内，语气专业果断。" 
+                      },
+                      { role: "user", content: q }
+                    ],
+                    temperature: 0.5
+                  })
+                });
+
+                const data = await response.json();
+                resDiv.innerHTML = `<p class="font-bold text-purple-400 mb-1">🤖 顾问紧急急救方案：</p>` + data.choices[0].message.content;
+                document.getElementById('advisor-input').value = '';
+
+            } catch (error) {
+                resDiv.innerHTML = `<span class="text-rose-400">诊断连接失败，请检查配置或重试。</span>`;
+            } finally {
+                btn.innerText = "咨询AI";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
