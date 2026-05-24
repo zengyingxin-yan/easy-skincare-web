@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowFlow || 智能护肤管理系统 v2.1</title>
+    <title>GlowFlow || 智能护肤管理系统 v2.2</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -21,35 +21,6 @@
             text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
         }
 
-        .neon-border-blue {
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
-            border: 1px solid rgba(0, 242, 254, 0.4);
-        }
-
-        .neon-text-pink {
-            text-shadow: 0 0 8px #ff007f;
-        }
-
-        .neon-text-blue {
-            text-shadow: 0 0 8px #00f2fe;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a051b;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3b2d54;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00f2fe;
-        }
-
         .breathing-glow {
             animation: breathe 3s infinite alternate;
         }
@@ -62,15 +33,15 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Header Banner -->
+    <!-- Header -->
     <header class="border-b border-purple-900 bg-black/40 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-3 h-3 rounded-full bg-cyan-400 breathing-glow"></div>
                 <h1 class="text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 cyber-brand">GlowFlow</h1>
-                <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/50">v2.1 全修复版</span>
+                <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/50">v2.2 稳定修复版</span>
             </div>
-            <!-- Tab Buttons -->
+            <!-- Tab Navigation Buttons -->
             <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
                 <button id="btn-routine" onclick="switchTab('routine')" class="px-5 py-2 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20">
                     🗓️ 周程日程表
@@ -82,77 +53,79 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 mt-4 space-y-4">
+    <main class="max-w-6xl mx-auto px-4 mt-6">
 
-        <!-- ==================== PERSISTENT API KEY CONFIG ==================== -->
-        <div class="bg-slate-950/40 backdrop-blur-md rounded-2xl p-4 border border-slate-800/80 shadow-xl">
-            <details class="group" id="api-panel">
-                <summary class="text-xs font-medium text-slate-400 cursor-pointer select-none flex items-center justify-between">
-                    <span class="flex items-center gap-2 text-cyan-400 font-semibold">🔑 硅基流动 SiliconFlow API 密钥密道</span>
-                    <span class="text-[10px] text-slate-500 group-open:hidden">点击配置密匙 ▾</span>
-                    <span class="text-[10px] text-slate-500 hidden group-open:inline">点击收起面板 ▴</span>
-                </summary>
-                <div class="mt-3 flex flex-col sm:flex-row gap-3">
-                    <input type="password" id="api-key-input" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 placeholder-slate-600" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-                    <button onclick="saveApiKey()" class="bg-cyan-950 hover:bg-cyan-900 border border-cyan-800 text-cyan-400 text-xs px-4 py-1.5 rounded-xl transition font-medium">
-                        保存密钥
-                    </button>
-                </div>
-            </details>
-        </div>
+        <!-- ==================== TOP PANELS: API KEY ==================== -->
+        <section class="mb-6">
+            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-4 border border-slate-800">
+                <details class="group">
+                    <summary class="text-xs font-medium text-cyan-400 cursor-pointer select-none flex items-center justify-between">
+                        <span>🔑 硅基流动 SiliconFlow API 密钥配置通道</span>
+                        <span class="text-slate-500 group-open:hidden">点击展开设置 ⚙️</span>
+                        <span class="text-slate-500 hidden group-open:inline">点击收起面板 ✖️</span>
+                    </summary>
+                    <div class="mt-3 space-y-2 pt-2 border-t border-slate-900">
+                        <p class="text-[11px] text-slate-400">请输入您的 SiliconFlow API Key，用于未来智能诊断扩展（数据仅保存在您手机本地）：</p>
+                        <div class="flex gap-2">
+                            <input type="password" id="api-key-input" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" placeholder="sk-...">
+                            <button onclick="saveApiKey()" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs px-4 py-1.5 rounded-xl font-bold transition">
+                                保存密钥
+                            </button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
         
         <!-- ==================== TAB 1: ROUTINE SCHEDULE ==================== -->
-        <section id="tab-routine-section" class="block space-y-4">
-            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800/80 shadow-2xl">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <section id="tab-routine-section" class="block space-y-6">
+            <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
                             <span>🗓️</span> 独立高效周日程表
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">此版日程与产品库彻底解耦，您可以随时随地像自由改文本一样复制、粘帖、改动您的计划，完全不会报错。</p>
+                        <p class="text-xs text-slate-400 mt-1">此版日程已与资产库完全解耦，您可以随时随地像自由改文本一样复制、粘贴、调整流程。</p>
                     </div>
                     <div class="flex gap-2 self-stretch md:self-auto">
                         <button onclick="resetRoutineToDefault()" class="flex-1 md:flex-none text-xs bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-700 px-3 py-2 rounded-xl transition">
-                            恢复经典推荐计划
+                            重置经典周计划
                         </button>
-                        <button onclick="exportRoutineToCSV()" class="flex-1 md:flex-none text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white px-4 py-2 rounded-xl shadow-lg shadow-purple-500/20 transition">
+                        <button onclick="exportRoutineToCSV()" class="flex-1 md:flex-none text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white px-4 py-2 rounded-xl shadow-lg transition">
                             📊 导出Excel表格
                         </button>
                     </div>
                 </div>
 
-                <!-- Fast Bulk Text Importer -->
+                <!-- Bulk Text Importer -->
                 <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 mb-6">
                     <details class="group" open>
                         <summary class="text-sm font-medium text-purple-400 cursor-pointer select-none flex items-center justify-between">
                             <span>⚡ 快捷全文本一键照搬/备份面板</span>
-                            <span class="text-xs text-slate-500 group-open:hidden">点击展开 ▾</span>
-                            <span class="text-xs text-slate-500 hidden group-open:inline">点击收起 ▴</span>
+                            <span class="text-xs text-slate-500 group-open:hidden">点击展开</span>
+                            <span class="text-xs text-slate-500 hidden group-open:inline">点击收起</span>
                         </summary>
                         <div class="mt-3 space-y-3">
-                            <p class="text-xs text-slate-400">您可以直接把大段护肤文案粘贴到下面。点击提取后，每一天独立的早/晚输入框会自动更新覆盖。</p>
-                            <textarea id="bulk-import-area" rows="6" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-300 focus:outline-none focus:border-purple-500 placeholder-slate-600" placeholder="粘贴您的计划文本，例如：
-周一：
-早：水，精华，面霜，防晒
-晚：水，水杨酸棉片，眼霜，面霜"></textarea>
+                            <p class="text-xs text-slate-400">直接把之前聊天的完整计划文本粘贴到下方，系统会自动尝试提取并分发到周一至周日的各个输入框中：</p>
+                            <textarea id="bulk-import-area" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 focus:outline-none focus:border-purple-500 placeholder-slate-600" placeholder="周一：&#10;早：雅诗兰黛微精华，珀莱雅双抗，兰蔻眼霜，珂润面霜，防晒&#10;晚：雅诗兰黛微精华，Stridex水杨酸棉片，雅诗兰黛眼霜，珂润面霜&#10;&#10;周二：&#10;..."></textarea>
                             <div class="flex gap-2 justify-end">
                                 <button onclick="handleBulkExtract()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2 rounded-lg transition font-medium">
-                                    ⚙️ 自动尝试提取并填入各文本框
+                                    ⚡ 智能识别并分发到下方表格
                                 </button>
                             </div>
                         </div>
                     </details>
                 </div>
 
-                <!-- Weekly Grid Dynamic Grid Structure -->
-                <div class="grid grid-cols-1 gap-4" id="weekly-days-container">
-                    <!-- Populated by JS -->
+                <!-- Daily List Container -->
+                <div id="weekly-days-container" class="space-y-4">
+                    <!-- Dynamic injection from JS -->
                 </div>
             </div>
         </section>
 
         <!-- ==================== TAB 2: INVENTORY MANAGEMENT ==================== -->
-        <section id="tab-inventory-section" class="hidden space-y-4">
+        <section id="tab-inventory-section" class="hidden space-y-6">
             <!-- Add Product Form -->
             <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800/80 shadow-2xl">
                 <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2">
@@ -178,28 +151,25 @@
                         <input type="text" id="prod-effect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-pink-500" placeholder="如：维稳修护、强韧肌底">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 text-white font-medium py-2 rounded-xl text-sm shadow-lg shadow-pink-500/20 transition">
+                        <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 text-white font-medium py-2 rounded-xl text-sm shadow-lg transition">
                             ➕ 添加至资产库
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Product Cards Display -->
+            <!-- Product List Display -->
             <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800/80 shadow-2xl">
                 <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-200 flex items-center gap-2">
-                            <span>📦</span> 当前储备物资清单 (<span id="product-count" class="text-pink-500">0</span>)
-                        </h2>
-                    </div>
+                    <h2 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                        <span>📦</span> 当前储备物资清单 (<span id="product-count" class="text-pink-500">0</span>)
+                    </h2>
                     <button onclick="clearAllProducts()" class="text-xs text-rose-400 border border-rose-950 hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition">
                         清空资产库
                     </button>
                 </div>
-
                 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Cards injection container -->
+                    <!-- Cards injection -->
                 </div>
             </div>
         </section>
@@ -207,6 +177,7 @@
     </main>
 
     <script>
+        // Default initialization data
         const defaultRoutineText = {
             1: { morning: "雅诗兰黛微精华、珀莱雅双抗、兰蔻眼霜、珂润面霜、防晒", night: "雅诗兰黛微精华、Stridex水杨酸棉片（局部）、雅诗兰黛眼霜、珂润面霜" },
             2: { morning: "雅诗兰黛微精华、兰蔻眼霜、优时颜乳液/珂润面霜、防晒", night: "雅诗兰黛微精华、雅诗兰黛眼霜、理肤泉B5面霜（修护）" },
@@ -223,10 +194,7 @@
             { id: "i3", name: "兰蔻眼霜", category: "面膜/眼霜/特殊处理", effect: "淡化眼纹、滋润眼周" },
             { id: "i4", name: "珂润面霜", category: "面霜", effect: "温和保湿、锁水修护" },
             { id: "i5", name: "Stridex水杨酸棉片", category: "面膜/眼霜/特殊处理", effect: "局部疏通、KO闭口" },
-            { id: "i6", name: "理肤泉B5面霜", category: "面霜", effect: "深层舒缓、褪红修护" },
-            { id: "i7", name: "自然堂小紫瓶精华霜", category: "面霜", effect: "黄金抗老、紧致提拉" },
-            { id: "i8", name: "Olay ProX白瓶精华", category: "精华", effect: "全脸美白、重点淡印" },
-            { id: "i9", name: "养生堂冬孕精华液", category: "精华", effect: "温和滋养、补充脂质" }
+            { id: "i6", name: "理肤泉B5面霜", category: "面霜", effect: "深层舒缓、褪红修护" }
         ];
 
         const weekdayNames = {
@@ -239,31 +207,35 @@
             0: "周日 ➔ 肌断食日"
         };
 
-        // Initialize reactive memory
+        // Reactive LocalStorage Handlers
         let currentRoutine = JSON.parse(localStorage.getItem('glowflow_routine')) || defaultRoutineText;
         let currentProducts = JSON.parse(localStorage.getItem('glowflow_products')) || defaultInventory;
 
-        window.onload = function() {
-            // Load stored API Key if exists
-            const savedKey = localStorage.getItem('glowflow_api_key') || '';
-            document.getElementById('api-key-input').value = savedKey;
-            
-            renderRoutineSchedule();
-            renderProductsGrid();
-            highlightToday();
-        };
+        // Run rendering safely on window load
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Initialize API key input UI if stored
+                const savedKey = localStorage.getItem('glowflow_api_key') || '';
+                if(document.getElementById('api-key-input')) {
+                    document.getElementById('api-key-input').value = savedKey;
+                }
+                
+                renderRoutineSchedule();
+                renderProductsGrid();
+                highlightToday();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
 
-        function saveApiKey() {
-            const keyVal = document.getElementById('api-key-input').value.trim();
-            localStorage.setItem('glowflow_api_key', keyVal);
-            alert('🔑 API 密钥已加密存储到当前设备本地！');
-        }
-
+        // Tab Navigation Switcher
         function switchTab(tab) {
             const rotSect = document.getElementById('tab-routine-section');
             const invSect = document.getElementById('tab-inventory-section');
             const btnRot = document.getElementById('btn-routine');
             const btnInv = document.getElementById('btn-inventory');
+
+            if (!rotSect || !invSect) return;
 
             if (tab === 'routine') {
                 rotSect.classList.remove('hidden');
@@ -278,10 +250,12 @@
             }
         }
 
+        // Render Routine List View
         function renderRoutineSchedule() {
             const container = document.getElementById('weekly-days-container');
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = '';
+
             const daySequence = [1, 2, 3, 4, 5, 6, 0];
             
             daySequence.forEach(day => {
@@ -298,23 +272,24 @@
                             <span class="inline-block w-2 h-2 rounded-full ${isSunday ? 'bg-rose-500' : 'bg-cyan-500'}"></span>
                             ${weekdayNames[day]}
                         </h3>
+                        <span class="text-[10px] bg-slate-800 text-slate-500 px-2 py-0.5 rounded uppercase font-mono tracking-wider">自动存盘</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-900">
                             <div class="text-xs font-semibold text-amber-400 mb-1.5">☀️ 早晨日程：</div>
                             <input type="text" 
-                                   value="${dayData.morning}" 
+                                   value="${dayData.morning || ''}" 
                                    oninput="updateSingleDayValue(${day}, 'morning', this.value)"
-                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" 
-                                   placeholder="可以直接照搬输入流程...">
+                                   class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" 
+                                   placeholder="输入您的早晨护肤流程...">
                         </div>
                         <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-900">
                             <div class="text-xs font-semibold text-indigo-400 mb-1.5">🌙 晚间日程：</div>
                             <input type="text" 
-                                   value="${dayData.night}" 
+                                   value="${dayData.night || ''}" 
                                    oninput="updateSingleDayValue(${day}, 'night', this.value)"
-                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-pink-500" 
-                                   placeholder="可以直接照搬输入流程...">
+                                   class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-pink-500" 
+                                   placeholder="输入您的晚间护肤流程...">
                         </div>
                     </div>
                 `;
@@ -332,51 +307,56 @@
             const today = new Date().getDay();
             const targetCard = document.getElementById(`day-card-${today}`);
             if (targetCard) {
-                targetCard.className = "p-4 rounded-xl border transition-all duration-300 bg-slate-900/80 border-cyan-500/80 shadow-[0_0_20px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/30";
+                targetCard.className = "p-4 rounded-xl border transition-all duration-300 bg-slate-900/80 border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/30";
                 const heading = targetCard.querySelector('h3');
                 if (heading && !heading.innerHTML.includes('TODAY')) {
-                    heading.innerHTML += ` <span class="text-[10px] bg-cyan-500 text-slate-950 px-1.5 py-0.5 rounded font-bold ml-2">TODAY 今天</span>`;
+                    heading.innerHTML += ` <span class="text-[10px] bg-cyan-400 text-slate-950 px-1.5 py-0.5 rounded font-bold ml-2">TODAY 今天</span>`;
                 }
             }
         }
 
         function resetRoutineToDefault() {
-            if(confirm("确定要恢复默认定制的周计划吗？")) {
-                currentRoutine = {...defaultRoutineText};
+            if(confirm("确定要恢复默认预设的经典护肤计划吗？")) {
+                currentRoutine = JSON.parse(JSON.stringify(defaultRoutineText));
                 localStorage.setItem('glowflow_routine', JSON.stringify(currentRoutine));
                 renderRoutineSchedule();
                 highlightToday();
             }
         }
 
+        // Safe Parsing Engine for Bulk Input Text lines
         function handleBulkExtract() {
             const text = document.getElementById('bulk-import-area').value.trim();
             if (!text) {
-                alert("请输入大段护肤计划文本！");
+                alert("请先粘贴需要录入的日程文本！");
                 return;
             }
 
-            const lines = text.split('\n');
-            let matchedDay = null;
+            const lines = text.split('
+');
+            let activeDay = null;
 
             lines.forEach(line => {
-                let currentLine = line.trim();
+                const currentLine = line.trim();
                 if (!currentLine) return;
 
-                if (currentLine.includes("周一") || currentLine.includes("星期一")) matchedDay = 1;
-                else if (currentLine.includes("周二") || currentLine.includes("星期二")) matchedDay = 2;
-                else if (currentLine.includes("周三") || currentLine.includes("星期三")) matchedDay = 3;
-                else if (currentLine.includes("周四") || currentLine.includes("星期四")) matchedDay = 4;
-                else if (currentLine.includes("周五") || currentLine.includes("星期五")) matchedDay = 5;
-                else if (currentLine.includes("周六") || currentLine.includes("星期六")) matchedDay = 6;
-                else if (currentLine.includes("周日") || currentLine.includes("星期日") || currentLine.includes("周天")) matchedDay = 0;
+                // Day Identification Rules
+                if (currentLine.includes("周一") || currentLine.includes("星期一")) activeDay = 1;
+                else if (currentLine.includes("周二") || currentLine.includes("星期二")) activeDay = 2;
+                else if (currentLine.includes("周三") || currentLine.includes("星期三")) activeDay = 3;
+                else if (currentLine.includes("周四") || currentLine.includes("星期四")) activeDay = 4;
+                else if (currentLine.includes("周五") || currentLine.includes("星期五")) activeDay = 5;
+                else if (currentLine.includes("周六") || currentLine.includes("星期六")) activeDay = 6;
+                else if (currentLine.includes("周日") || currentLine.includes("星期日") || currentLine.includes("周天")) activeDay = 0;
 
-                if (matchedDay !== null) {
+                if (activeDay !== null) {
                     if (currentLine.startsWith("早：") || currentLine.startsWith("早") || currentLine.includes("早晨：")) {
-                        currentRoutine[matchedDay].morning = currentLine.replace(/早：|早/g, '').trim();
+                        let clean = currentLine.replace(/^早[：:]?/, '').trim();
+                        currentRoutine[activeDay].morning = clean;
                     }
                     if (currentLine.startsWith("晚：") || currentLine.startsWith("晚") || currentLine.includes("晚间：")) {
-                        currentRoutine[matchedDay].night = currentLine.replace(/晚：|晚/g, '').trim();
+                        let clean = currentLine.replace(/^晚[：:]?/, '').trim();
+                        currentRoutine[activeDay].night = clean;
                     }
                 }
             });
@@ -384,12 +364,20 @@
             localStorage.setItem('glowflow_routine', JSON.stringify(currentRoutine));
             renderRoutineSchedule();
             highlightToday();
-            alert("✨ 提取匹配成功！");
+            alert("✨ 提取转换完成！您可以在下面每一天的输入框中直接修改微调文本。");
         }
 
+        // Save Key Securely
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('glowflow_api_key', key);
+            alert("🔑 API 密钥已保存在您本地，安全生效！");
+        }
+
+        // Export CSV Tables File
         function exportRoutineToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,﻿";
-            csvContent += "日期,时间段,护肤步骤细节
+            csvContent += "日期,时间段,流程细节
 ";
             const daySequence = [1, 2, 3, 4, 5, 6, 0];
             const nameMap = {1:"周一", 2:"周二", 3:"周三", 4:"周四", 5:"周五", 6:"周六", 0:"周日"};
@@ -397,53 +385,48 @@
             daySequence.forEach(d => {
                 let m = (currentRoutine[d]?.morning || "").replace(/,/g, "，");
                 let n = (currentRoutine[d]?.night || "").replace(/,/g, "，");
-                csvContent += `${nameMap[d]},早晨流程,"${m}"
+                csvContent += `${nameMap[d]},早晨,"${m}"
 `;
-                csvContent += `${nameMap[d]},晚间流程,"${n}"
+                csvContent += `${nameMap[d]},晚间,"${n}"
 `;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "GlowFlow_我的护肤周日程表.csv");
+            link.setAttribute("download", "我的GlowFlow护肤日程表.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
+        // ==================== INVENTORY SYSTEMS ====================
         function renderProductsGrid() {
             const grid = document.getElementById('products-grid');
             const countSpan = document.getElementById('product-count');
             if(!grid || !countSpan) return;
             grid.innerHTML = '';
+            
             countSpan.innerText = currentProducts.length;
 
             if (currentProducts.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">📦 资产库目前空空如也。</div>`;
+                grid.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-slate-500">📦 资产库目前没有物资，快录入第一件吧。</div>`;
                 return;
             }
 
-            currentProducts.forEach((prod) => {
+            currentProducts.forEach(prod => {
                 const card = document.createElement('div');
                 card.className = "p-4 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition";
-                
-                let badgeColor = "bg-slate-800 text-slate-400";
-                if(prod.category === "精华") badgeColor = "bg-purple-950 text-purple-400 border border-purple-900";
-                else if(prod.category === "保湿水") badgeColor = "bg-cyan-950 text-cyan-400 border border-cyan-900";
-                else if(prod.category === "面霜") badgeColor = "bg-emerald-950 text-emerald-400 border border-emerald-900";
-                else if(prod.category === "防晒") badgeColor = "bg-amber-950 text-amber-400 border border-amber-900";
-
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h4 class="font-bold text-sm text-slate-200">${prod.name}</h4>
-                            <span class="text-[10px] px-2 py-0.5 rounded font-medium ${badgeColor}">${prod.category}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-medium bg-slate-800 text-slate-400 border border-slate-700">${prod.category}</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1"><span class="text-slate-600">主要功效：</span>${prod.effect || '未注明'}</p>
+                        <p class="text-xs text-slate-400"><span class="text-slate-600">主打功效：</span>${prod.effect || '基础保湿'}</p>
                     </div>
                     <div class="mt-4 pt-2 border-t border-slate-800/60 flex justify-end">
-                        <button onclick="deleteProduct('${prod.id}')" class="text-[11px] text-rose-400/80 hover:text-rose-400 transition">🗑️ 移除资产</button>
+                        <button onclick="deleteProduct('${prod.id}')" class="text-[11px] text-rose-400 hover:underline">🗑️ 移除</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -456,6 +439,8 @@
             const catSelect = document.getElementById('prod-category');
             const effInput = document.getElementById('prod-effect');
 
+            if(!nameInput || !nameInput.value.trim()) return;
+
             const newProduct = {
                 id: 'i_' + Date.now(),
                 name: nameInput.value.trim(),
@@ -465,6 +450,7 @@
 
             currentProducts.unshift(newProduct);
             localStorage.setItem('glowflow_products', JSON.stringify(currentProducts));
+            
             nameInput.value = '';
             effInput.value = '';
             renderProductsGrid();
@@ -477,7 +463,7 @@
         }
 
         function clearAllProducts() {
-            if(confirm("确定要全部清空您的物资资产库吗？")) {
+            if(confirm("确定要全部清空物资资产库吗？")) {
                 currentProducts = [];
                 localStorage.setItem('glowflow_products', JSON.stringify(currentProducts));
                 renderProductsGrid();
