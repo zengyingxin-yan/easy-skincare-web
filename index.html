@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowFlow || 智能护肤管理系统</title>
+    <title>GlowFlow || 智能护肤管理系统 v2.1</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,16 +24,6 @@
         .neon-border-blue {
             box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
             border: 1px solid rgba(0, 242, 254, 0.4);
-        }
-
-        .neon-border-pink {
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
-            border: 1px solid rgba(255, 0, 127, 0.4);
-        }
-
-        .neon-border-purple {
-            box-shadow: 0 0 15px rgba(186, 85, 211, 0.2);
-            border: 1px solid rgba(186, 85, 211, 0.4);
         }
 
         .neon-text-pink {
@@ -78,7 +68,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-3 h-3 rounded-full bg-cyan-400 breathing-glow"></div>
                 <h1 class="text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 cyber-brand">GlowFlow</h1>
-                <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/50">v2.0 独立解耦版</span>
+                <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/50">v2.1 全修复版</span>
             </div>
             <!-- Tab Buttons -->
             <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
@@ -92,10 +82,27 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 mt-6">
+    <main class="max-w-6xl mx-auto px-4 mt-4 space-y-4">
+
+        <!-- ==================== PERSISTENT API KEY CONFIG ==================== -->
+        <div class="bg-slate-950/40 backdrop-blur-md rounded-2xl p-4 border border-slate-800/80 shadow-xl">
+            <details class="group" id="api-panel">
+                <summary class="text-xs font-medium text-slate-400 cursor-pointer select-none flex items-center justify-between">
+                    <span class="flex items-center gap-2 text-cyan-400 font-semibold">🔑 硅基流动 SiliconFlow API 密钥密道</span>
+                    <span class="text-[10px] text-slate-500 group-open:hidden">点击配置密匙 ▾</span>
+                    <span class="text-[10px] text-slate-500 hidden group-open:inline">点击收起面板 ▴</span>
+                </summary>
+                <div class="mt-3 flex flex-col sm:flex-row gap-3">
+                    <input type="password" id="api-key-input" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 placeholder-slate-600" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                    <button onclick="saveApiKey()" class="bg-cyan-950 hover:bg-cyan-900 border border-cyan-800 text-cyan-400 text-xs px-4 py-1.5 rounded-xl transition font-medium">
+                        保存密钥
+                    </button>
+                </div>
+            </details>
+        </div>
         
         <!-- ==================== TAB 1: ROUTINE SCHEDULE ==================== -->
-        <section id="tab-routine-section" class="block space-y-6">
+        <section id="tab-routine-section" class="block space-y-4">
             <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800/80 shadow-2xl">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                     <div>
@@ -106,30 +113,28 @@
                     </div>
                     <div class="flex gap-2 self-stretch md:self-auto">
                         <button onclick="resetRoutineToDefault()" class="flex-1 md:flex-none text-xs bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-700 px-3 py-2 rounded-xl transition">
-                            恢复Gemini推荐周计划
+                            恢复经典推荐计划
                         </button>
                         <button onclick="exportRoutineToCSV()" class="flex-1 md:flex-none text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white px-4 py-2 rounded-xl shadow-lg shadow-purple-500/20 transition">
-                            📊 导出今日日程
+                            📊 导出Excel表格
                         </button>
                     </div>
                 </div>
 
                 <!-- Fast Bulk Text Importer -->
                 <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 mb-6">
-                    <details class="group">
+                    <details class="group" open>
                         <summary class="text-sm font-medium text-purple-400 cursor-pointer select-none flex items-center justify-between">
                             <span>⚡ 快捷全文本一键照搬/备份面板</span>
-                            <span class="text-xs text-slate-500 group-open:hidden">点击展开</span>
-                            <span class="text-xs text-slate-500 hidden group-open:inline">点击收起</span>
+                            <span class="text-xs text-slate-500 group-open:hidden">点击展开 ▾</span>
+                            <span class="text-xs text-slate-500 hidden group-open:inline">点击收起 ▴</span>
                         </summary>
                         <div class="mt-3 space-y-3">
-                            <p class="text-xs text-slate-400">您可以直接把任何格式的计划粘贴到下面。点击覆盖后，每一天独立的“早/晚”文本框会自动更新。</p>
-                            <textarea id="bulk-import-area" rows="6" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-300 focus:outline-none focus:border-purple-500 placeholder-slate-600" placeholder="周一：
+                            <p class="text-xs text-slate-400">您可以直接把大段护肤文案粘贴到下面。点击提取后，每一天独立的早/晚输入框会自动更新覆盖。</p>
+                            <textarea id="bulk-import-area" rows="6" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-300 focus:outline-none focus:border-purple-500 placeholder-slate-600" placeholder="粘贴您的计划文本，例如：
+周一：
 早：水，精华，面霜，防晒
-晚：水，水杨酸棉片，眼霜，面霜
-
-周二：
-..."></textarea>
+晚：水，水杨酸棉片，眼霜，面霜"></textarea>
                             <div class="flex gap-2 justify-end">
                                 <button onclick="handleBulkExtract()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2 rounded-lg transition font-medium">
                                     ⚙️ 自动尝试提取并填入各文本框
@@ -140,17 +145,14 @@
                 </div>
 
                 <!-- Weekly Grid Dynamic Grid Structure -->
-                <div class="grid grid-cols-1 gap-6">
-                    <!-- Day Block Macro Builder -->
-                    <div id="weekly-days-container" class="space-y-4">
-                        <!-- Populated by JS -->
-                    </div>
+                <div class="grid grid-cols-1 gap-4" id="weekly-days-container">
+                    <!-- Populated by JS -->
                 </div>
             </div>
         </section>
 
         <!-- ==================== TAB 2: INVENTORY MANAGEMENT ==================== -->
-        <section id="tab-inventory-section" class="hidden space-y-6">
+        <section id="tab-inventory-section" class="hidden space-y-4">
             <!-- Add Product Form -->
             <div class="bg-slate-950/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800/80 shadow-2xl">
                 <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2">
@@ -205,7 +207,6 @@
     </main>
 
     <script>
-        // Default static data for fallback/recovery
         const defaultRoutineText = {
             1: { morning: "雅诗兰黛微精华、珀莱雅双抗、兰蔻眼霜、珂润面霜、防晒", night: "雅诗兰黛微精华、Stridex水杨酸棉片（局部）、雅诗兰黛眼霜、珂润面霜" },
             2: { morning: "雅诗兰黛微精华、兰蔻眼霜、优时颜乳液/珂润面霜、防晒", night: "雅诗兰黛微精华、雅诗兰黛眼霜、理肤泉B5面霜（修护）" },
@@ -238,18 +239,26 @@
             0: "周日 ➔ 肌断食日"
         };
 
-        // Reactive Data States
+        // Initialize reactive memory
         let currentRoutine = JSON.parse(localStorage.getItem('glowflow_routine')) || defaultRoutineText;
         let currentProducts = JSON.parse(localStorage.getItem('glowflow_products')) || defaultInventory;
 
-        // Init App On Windows Load
         window.onload = function() {
+            // Load stored API Key if exists
+            const savedKey = localStorage.getItem('glowflow_api_key') || '';
+            document.getElementById('api-key-input').value = savedKey;
+            
             renderRoutineSchedule();
             renderProductsGrid();
             highlightToday();
         };
 
-        // Navigation Tab Switcher
+        function saveApiKey() {
+            const keyVal = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('glowflow_api_key', keyVal);
+            alert('🔑 API 密钥已加密存储到当前设备本地！');
+        }
+
         function switchTab(tab) {
             const rotSect = document.getElementById('tab-routine-section');
             const invSect = document.getElementById('tab-inventory-section');
@@ -269,12 +278,10 @@
             }
         }
 
-        // Render Schedule View
         function renderRoutineSchedule() {
             const container = document.getElementById('weekly-days-container');
+            if(!container) return;
             container.innerHTML = '';
-
-            // Sorted Order Monday to Sunday
             const daySequence = [1, 2, 3, 4, 5, 6, 0];
             
             daySequence.forEach(day => {
@@ -291,26 +298,23 @@
                             <span class="inline-block w-2 h-2 rounded-full ${isSunday ? 'bg-rose-500' : 'bg-cyan-500'}"></span>
                             ${weekdayNames[day]}
                         </h3>
-                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase font-mono tracking-wider">实时保存</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Morning Input Area -->
                         <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-900">
-                            <div class="text-xs font-semibold text-amber-400 mb-1.5 flex items-center gap-1">☀️ 早晨日程：</div>
+                            <div class="text-xs font-semibold text-amber-400 mb-1.5">☀️ 早晨日程：</div>
                             <input type="text" 
                                    value="${dayData.morning}" 
                                    oninput="updateSingleDayValue(${day}, 'morning', this.value)"
-                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30" 
-                                   placeholder="可以直接照搬输入流程，例如：洁面、水、乳液、防晒...">
+                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" 
+                                   placeholder="可以直接照搬输入流程...">
                         </div>
-                        <!-- Night Input Area -->
                         <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-900">
-                            <div class="text-xs font-semibold text-indigo-400 mb-1.5 flex items-center gap-1">🌙 晚间日程：</div>
+                            <div class="text-xs font-semibold text-indigo-400 mb-1.5">🌙 晚间日程：</div>
                             <input type="text" 
                                    value="${dayData.night}" 
                                    oninput="updateSingleDayValue(${day}, 'night', this.value)"
-                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30" 
-                                   placeholder="可以直接照搬输入流程，例如：刷酸、眼霜、面霜...">
+                                   class="w-full bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-pink-500" 
+                                   placeholder="可以直接照搬输入流程...">
                         </div>
                     </div>
                 `;
@@ -318,27 +322,26 @@
             });
         }
 
-        // Sync individual input state change
         function updateSingleDayValue(day, timeKey, value) {
             if (!currentRoutine[day]) currentRoutine[day] = { morning: '', night: '' };
             currentRoutine[day][timeKey] = value;
             localStorage.setItem('glowflow_routine', JSON.stringify(currentRoutine));
         }
 
-        // Highlight Current Day Border Style
         function highlightToday() {
-            const today = new Date().getDay(); // 0 is Sunday, 1 is Monday...
+            const today = new Date().getDay();
             const targetCard = document.getElementById(`day-card-${today}`);
             if (targetCard) {
                 targetCard.className = "p-4 rounded-xl border transition-all duration-300 bg-slate-900/80 border-cyan-500/80 shadow-[0_0_20px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/30";
                 const heading = targetCard.querySelector('h3');
-                if (heading) heading.innerHTML += ` <span class="text-[10px] bg-cyan-500 text-slate-950 px-1.5 py-0.5 rounded font-bold ml-2">TODAY 今天</span>`;
+                if (heading && !heading.innerHTML.includes('TODAY')) {
+                    heading.innerHTML += ` <span class="text-[10px] bg-cyan-500 text-slate-950 px-1.5 py-0.5 rounded font-bold ml-2">TODAY 今天</span>`;
+                }
             }
         }
 
-        // Fallback default routine injector
         function resetRoutineToDefault() {
-            if(confirm("确定要覆盖当前修改，恢复为您定制的 Gemini 一周经典护肤组合日程吗？")) {
+            if(confirm("确定要恢复默认定制的周计划吗？")) {
                 currentRoutine = {...defaultRoutineText};
                 localStorage.setItem('glowflow_routine', JSON.stringify(currentRoutine));
                 renderRoutineSchedule();
@@ -346,24 +349,20 @@
             }
         }
 
-        // Text parsing logic to capture copied text chunks
         function handleBulkExtract() {
             const text = document.getElementById('bulk-import-area').value.trim();
             if (!text) {
-                alert("请输入需要清洗提取的日程文本内容！");
+                alert("请输入大段护肤计划文本！");
                 return;
             }
 
-            // Simple text parse pipeline
-            const lines = text.split('
-');
+            const lines = text.split('\n');
             let matchedDay = null;
 
-            for (let i = 0; i < lines.length; i++) {
-                let currentLine = lines[i].trim();
-                if (!currentLine) continue;
+            lines.forEach(line => {
+                let currentLine = line.trim();
+                if (!currentLine) return;
 
-                // Detect Day
                 if (currentLine.includes("周一") || currentLine.includes("星期一")) matchedDay = 1;
                 else if (currentLine.includes("周二") || currentLine.includes("星期二")) matchedDay = 2;
                 else if (currentLine.includes("周三") || currentLine.includes("星期三")) matchedDay = 3;
@@ -374,28 +373,24 @@
 
                 if (matchedDay !== null) {
                     if (currentLine.startsWith("早：") || currentLine.startsWith("早") || currentLine.includes("早晨：")) {
-                        let cleanText = currentLine.replace(/早：|早/g, '').trim();
-                        currentRoutine[matchedDay].morning = cleanText;
+                        currentRoutine[matchedDay].morning = currentLine.replace(/早：|早/g, '').trim();
                     }
                     if (currentLine.startsWith("晚：") || currentLine.startsWith("晚") || currentLine.includes("晚间：")) {
-                        let cleanText = currentLine.replace(/晚：|晚/g, '').trim();
-                        currentRoutine[matchedDay].night = cleanText;
+                        currentRoutine[matchedDay].night = currentLine.replace(/晚：|晚/g, '').trim();
                     }
                 }
-            }
+            });
 
             localStorage.setItem('glowflow_routine', JSON.stringify(currentRoutine));
             renderRoutineSchedule();
             highlightToday();
-            alert("✨ 提取转换完成！如果不精准，您可以直接在下方各文本框内手动微调。");
+            alert("✨ 提取匹配成功！");
         }
 
-        // Export To Clean CSV Table File
         function exportRoutineToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,﻿";
             csvContent += "日期,时间段,护肤步骤细节
 ";
-            
             const daySequence = [1, 2, 3, 4, 5, 6, 0];
             const nameMap = {1:"周一", 2:"周二", 3:"周三", 4:"周四", 5:"周五", 6:"周六", 0:"周日"};
 
@@ -417,21 +412,15 @@
             document.body.removeChild(link);
         }
 
-
-        // ==================== INVENTORY LOGIC CONTROLLER ====================
         function renderProductsGrid() {
             const grid = document.getElementById('products-grid');
             const countSpan = document.getElementById('product-count');
+            if(!grid || !countSpan) return;
             grid.innerHTML = '';
-            
             countSpan.innerText = currentProducts.length;
 
             if (currentProducts.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-8 text-center text-xs text-slate-500">
-                        📦 资产库目前空空如也，快录入您的第一件护肤宝贝吧。
-                    </div>
-                `;
+                grid.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">📦 资产库目前空空如也。</div>`;
                 return;
             }
 
@@ -449,14 +438,12 @@
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h4 class="font-bold text-sm text-slate-200">${prod.name}</h4>
-                            <span class="text-[10px] px-2 py-0.5 rounded font-medium whitespace-nowrap ${badgeColor}">${prod.category}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-medium ${badgeColor}">${prod.category}</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1"><span class="text-slate-600">主要功效：</span>${prod.effect || '未注明'}</p>
                     </div>
                     <div class="mt-4 pt-2 border-t border-slate-800/60 flex justify-end">
-                        <button onclick="deleteProduct('${prod.id}')" class="text-[11px] text-rose-400/80 hover:text-rose-400 transition">
-                            🗑️ 移除资产
-                        </button>
+                        <button onclick="deleteProduct('${prod.id}')" class="text-[11px] text-rose-400/80 hover:text-rose-400 transition">🗑️ 移除资产</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -478,11 +465,8 @@
 
             currentProducts.unshift(newProduct);
             localStorage.setItem('glowflow_products', JSON.stringify(currentProducts));
-            
-            // Reset input text lines
             nameInput.value = '';
             effInput.value = '';
-            
             renderProductsGrid();
         }
 
